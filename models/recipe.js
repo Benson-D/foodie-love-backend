@@ -13,7 +13,7 @@ class Recipe {
      * instructions, mealType }
      * 
      * 
-     * @param {*} recipeData 
+     * @param {Object} recipeData 
      * @return {Promise<string>} JSON 
      * [{ id }]
      */
@@ -48,20 +48,22 @@ class Recipe {
      * 
      * If ingredient already in database returns that ingredient data
      * 
-     * @param {*} ingredientId
+     * @param {string} ingredientName
      * @return {Promise<string>} JSON 
      * [{ id, ingredientName }]
      */
     static async insertIngredients(ingredientName){
+        if (typeof ingredientName !== 'string') return;
+
         const checkIngredient = await db.query(
             `SELECT id, 
                     ingredient_name AS ingredientName
              FROM ingredients
              WHERE ingredient_name = $1`, [ingredientName]);
         
-        const duplicateIngredient = checkIngredient.rows[0]; 
+        const existingIngredient = checkIngredient.rows[0]; 
 
-        if (duplicateIngredient) return duplicateIngredient;
+        if (existingIngredient) return existingIngredient;
         
         const result = await db.query(
             `INSERT INTO ingredients (ingredient_name)
@@ -109,7 +111,10 @@ class Recipe {
     }
 
     /**
-     * Create a recipe with data of ingredients 
+     * Creates a function to direct the data needed to make measurement,
+     * ingredient, and recipe ingredients
+     * 
+     * Measurement can be null, handles case if value is empty
      * 
      * @param {Object} recipeList 
      * @param {Number} recipeId 
@@ -142,7 +147,7 @@ class Recipe {
      * 
      * data should be { recipeId, measurementId, ingredientId, amount }
      * 
-     * @param {*} recipeData
+     * @param {Object} recipeData
      * @return {Promise<string>} JSON
      *  [{ recipeId, measurementId, ingredientId, amount }]
      */
@@ -214,7 +219,7 @@ class Recipe {
      * - cookingTime
      * - mealType
      * 
-     * @param {*} searchFilters 
+     * @param {Object} searchFilters 
      * @returns {Promise<string>} JSON 
      * [{id, recipeName, cookingTime, recipeImage, mealType }]
      */

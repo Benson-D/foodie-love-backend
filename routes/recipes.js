@@ -16,7 +16,13 @@ const router = new express.Router();
 
 const upload = multer({ dest: "uploads/"});
 
-
+/** POST / { recipe } =>  { recipe }
+ * 
+ * recipe req.body: { recipeName, prepTime, cookingTime, recipeImage, 
+ *                instructions, mealType, ingredientList }
+ *        req.fle: { recipeImage } 
+ * 
+ */
 router.post("/", upload.single('recipeImage'), async function (req, res) {
     const validator = jsonschema.validate(req.body, recipeNewSchema);
 

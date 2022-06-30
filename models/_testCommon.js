@@ -5,12 +5,15 @@ const { BCRYPT_WORK_FACTOR } = require("../config");
 
 const recipeIds = [];
 const ingredientIds = [];
+const measurementIds = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM recipes");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM ingredients");
+  // noinspection SqlWithoutWhere
+  await db.query("DELETE FROM measurement_units");
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users"); 
 
@@ -38,6 +41,14 @@ async function commonBeforeAll() {
         RETURNING id`);
 
   ingredientIds.splice(0, 0, ...resultIngredient.rows.map(ingr => ingr.id));
+
+  const resultMeasurement = await db.query(`
+        INSERT INTO measurement_units(measurement_description)
+        VALUES ('measurement_cup'),
+               ('measurement_teaspoon')
+        RETURNING id`);
+  
+  measurementIds.splice(0, 0, ...resultMeasurement.rows.map(m => m.id));
 
   await db.query(`
         INSERT INTO users(username,
@@ -86,5 +97,6 @@ module.exports = {
   commonAfterEach,
   commonAfterAll,
   recipeIds,
-  ingredientIds
+  ingredientIds,
+  measurementIds
 };

@@ -57,7 +57,7 @@ class Recipe {
 
         const checkIngredient = await db.query(
             `SELECT id, 
-                    ingredient_name AS ingredientName
+                    ingredient_name AS "ingredientName"
              FROM ingredients
              WHERE ingredient_name = $1`, [ingredientName]);
         
@@ -91,7 +91,7 @@ class Recipe {
 
         const checkMeasurement = await db.query(
             `SELECT id, 
-                    measurement_description AS measurementDescription
+                    measurement_description AS "measurement"
             FROM measurement_units
             WHERE measurement_description = $1`, [measurementDescription]);
         
@@ -102,7 +102,7 @@ class Recipe {
         const result = await db.query(
             `INSERT INTO measurement_units (measurement_description)
             VALUES ($1)
-            RETURNING id, measurement_description AS "measurementDescription"`,
+            RETURNING id, measurement_description AS "measurement"`,
             [ measurementDescription ]);
 
         const measurement = result.rows[0];
@@ -271,7 +271,7 @@ class Recipe {
             const ingredientList =
                 { 
                     amount: ingredient.amount,
-                    measurement: ingredient.measurement_description,
+                    measurement: ingredient.measurement,
                     ingredient: ingredient.ingredient_name,
 
                 };
@@ -307,7 +307,7 @@ class Recipe {
                     recipes.meal_type,
                     recipes.instructions,
                     recipe_ingredients.amount,
-                    measurement_units.measurement_description,
+                    measurement_units.measurement_description AS "measurement",
                     ingredients.ingredient_name
             FROM recipes
                INNER JOIN 

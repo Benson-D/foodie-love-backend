@@ -58,6 +58,25 @@ describe("create recipes", function() {
             })
     });
 
+    test("handle duplicate ingredients", async function() {
+        const ingredient = await Recipe.insertIngredients('ingredient_1');
+        expect(ingredient).toEqual({
+            id: expect.any(Number),
+            ingredientName: 'ingredient_1'
+        })
+       
+    });
+
+    test("handle non string ingredient value", async function() {
+        try {
+            await Recipe.insertIngredients(0);
+            fail();
+        } catch(err) {
+            expect(err instanceof BadRequestError).toBeTruthy();
+        }
+       
+    });
+
     test("return an existing ingredient", async function() {
         let ingredient = await Recipe.insertIngredients('ingredient_1');
         expect(ingredient).toEqual(
@@ -76,6 +95,11 @@ describe("create recipes", function() {
                 measurement: "test_measurement"
             }
         )
+    });
+
+    test("handles empty measurments", async function() {
+        let measurement = await Recipe.insertMeasurements('');
+        expect(measurement).toEqual(undefined);
     });
 
     test("create recipe ingredients", async function() {

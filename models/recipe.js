@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { NotFoundError } = require("../expressError");
+const { BadRequestError, NotFoundError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for recipes. */
@@ -53,7 +53,9 @@ class Recipe {
      * [{ id, ingredientName }]
      */
     static async insertIngredients(ingredientName) {
-        if (typeof ingredientName !== 'string') return;
+        if (typeof ingredientName !== 'string') {
+            throw new BadRequestError('Not a valid ingredient');
+        };
 
         const checkIngredient = await db.query(
             `SELECT id, 

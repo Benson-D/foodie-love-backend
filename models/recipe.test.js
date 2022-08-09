@@ -28,12 +28,26 @@ describe("create recipes", function() {
         recipeImage: 'http://new-recipe.img',
         instructions: 'testing creation of recipe',
         mealType: 'italian'
-    }
+    };
 
     test("create a recipe", async function() {
         let recipe = await Recipe.insertRecipe(newRecipe); 
         expect(recipe).toEqual({ id: expect.any(Number) });
-    })
+
+        const recipeResponse = await db.query(            
+            `SELECT id,
+             recipe_name
+            FROM recipes
+            WHERE recipe_name = $1`, ['test_recipe']);
+
+        //Validate
+        expect(recipeResponse.rows).toEqual([
+            {
+                id: expect.any(Number),
+                recipe_name: "test_recipe"
+            }])
+    });
+
 
     test("create ingredient", async function() {
         let ingredient = await Recipe.insertIngredients('test_food');
@@ -42,7 +56,7 @@ describe("create recipes", function() {
                 id: expect.any(Number),
                 ingredientName: 'test_food'
             })
-    })
+    });
 
     test("return an existing ingredient", async function() {
         let ingredient = await Recipe.insertIngredients('ingredient_1');
@@ -52,7 +66,7 @@ describe("create recipes", function() {
                 ingredientName: 'ingredient_1'
             }
         )
-    })
+    });
 
     test("create measurement", async function() {
         let measurement = await Recipe.insertMeasurements('test_measurement');
@@ -62,32 +76,32 @@ describe("create recipes", function() {
                 measurement: "test_measurement"
             }
         )
-    })
+    });
 
     test("create recipe ingredients", async function() {
         let recipeIngredient = await Recipe.insertRecipeIngredients(
             {
-                recipeId: recipeIds[0],
-                measurementId: measurementIds[0],
-                ingredientId: ingredientIds[0],
+                recipeId: recipeIds[1],
+                measurementId: measurementIds[1],
+                ingredientId: ingredientIds[1],
                 amount: 5
             }
         );
         expect(recipeIngredient).toEqual(
             {
-                recipeId: recipeIds[0],
-                measurementId: measurementIds[0],
-                ingredientId: ingredientIds[0],
+                recipeId: recipeIds[1],
+                measurementId: measurementIds[1],
+                ingredientId: ingredientIds[1],
                 amount: "5"
             }
         );
-    })
+    });
 
 })
 
 /********************************* findAll ************************************/
 describe("findAll", function() {
-    test("works: all recipes", async function(){
+    test("works: all recipes", async function() {
 
         let recipes = await Recipe.findAll();
         expect(recipes).toEqual([
@@ -146,7 +160,7 @@ describe("findAll", function() {
                 mealType: "italian"
             }
         ])
-    })
+    });
 
     test("works: find recipe type", async function() {
         const recipes = await Recipe.findAll({ recipeName: "vegan"});
@@ -168,7 +182,7 @@ describe("findAll", function() {
                 mealType: "vegan"
             },
         ])
-    })
+    });
 
     test("works: find recipe name", async function() {
         const recipes = await Recipe.findAll({ recipeName: "1"});
@@ -182,7 +196,7 @@ describe("findAll", function() {
                 mealType: "vegan"
             },
         ])
-    })
+    });
 
     test("works find cooking time", async function() {
         const recipes = await Recipe.findAll({ cookingTime: 20 });
@@ -204,6 +218,45 @@ describe("findAll", function() {
                 mealType: "italian"
             } 
         ])
+    });
+
+    test("handles not found values", async function() {
+        const recipes = await Recipe.findAll({ recipeName: 1000000 });
+        expect(recipes).toEqual([]);
     })
+
+});
+/******************************* getRecipe ************************************/
+describe("get recipe", function() {
+    test('finds a recipe', async function() {
+        const recipe = await Recipe.getRecipe(recipeIds[0]);
+        expect(recipe).toEqual([
+            {
+                id: recipeIds[0],
+                recipeName: "recipe_1",
+                prepTime: '1 minutes',
+                cookingTime: '10 minutes', 
+                recipeImage: null,
+                mealType: "vegan",
+                instructions: "testing, recipe_1",
+                ingredients: [
+                    {
+                        amount: '5', 
+                        measurement: 'measurement_cup',
+                        ingredient: 'ingredient_1'
+                    }
+                ] 
+            },
+        ])  
+    });
+
+    test('not found if no such recipe', async function() {
+        try {
+            await Recipe.getRecipe(9999);
+            fail();
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
 
 });

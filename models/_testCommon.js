@@ -51,6 +51,15 @@ async function commonBeforeAll() {
   measurementIds.splice(0, 0, ...resultMeasurement.rows.map(m => m.id));
 
   await db.query(`
+        INSERT INTO recipe_ingredients(recipe_id, 
+                                       measurement_id,
+                                       ingredient_id, 
+                                       amount) 
+        VALUES ($1, $2, $3, 5)`, 
+        [recipeIds[0], measurementIds[0], ingredientIds[0]
+      ]);
+
+  await db.query(`
         INSERT INTO users(username,
                           password,
                           first_name,

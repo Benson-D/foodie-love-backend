@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { BadRequestError, NotFoundError } = require("../expressError");
+const { NotFoundError } = require("../expressError");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 /** Related functions for recipes. */
@@ -17,7 +17,7 @@ class Recipe {
      * @return {Promise<string>} JSON 
      * [{ id }]
      */
-    static async insertRecipe(recipeData){
+    static async insertRecipe(recipeData) {
         const { recipeName, prepTime, cookingTime, recipeImage, 
                 instructions, mealType } = recipeData; 
         
@@ -52,7 +52,7 @@ class Recipe {
      * @return {Promise<string>} JSON 
      * [{ id, ingredientName }]
      */
-    static async insertIngredients(ingredientName){
+    static async insertIngredients(ingredientName) {
         if (typeof ingredientName !== 'string') return;
 
         const checkIngredient = await db.query(
@@ -120,7 +120,7 @@ class Recipe {
      * @param {Number} recipeId 
      * @returns {Promise<string>} JSON 
      */
-    static async _ingredientBuilder(recipeList, recipeId){
+    static async _ingredientBuilder(recipeList, recipeId) {
         const { measurement, ingredient } = recipeList;
 
         const recipeMeasurement = await this.insertMeasurements(measurement);
@@ -167,7 +167,6 @@ class Recipe {
         return recipeIngredient;
     }
 
-
     /**
      * Create WHERE clause for filters, to be used by functions that query
      * with filters.
@@ -194,7 +193,7 @@ class Recipe {
             `)
         }
 
-        if (mealType !== undefined) {
+        if(mealType !== undefined) {
             values.push(mealType);
             whereParts.push(`meal_type = $${values.length}}`);
         }
@@ -223,7 +222,7 @@ class Recipe {
      * @returns {Promise<string>} JSON 
      * [{id, recipeName, cookingTime, recipeImage, mealType }]
      */
-    static async findAll(searchFilters = {}){ 
+    static async findAll(searchFilters = {}) { 
         const { recipeName, cookingTime, mealType } = searchFilters;
 
         const { whereClaus, values } = this._filterWhereBuilder({
@@ -258,7 +257,7 @@ class Recipe {
      *       "ingredient": "testIngredient" 
      *   }, ...]};
      */
-     static _generateRecipe(recipe){
+     static _generateRecipe(recipe) {
         const recipeList = {};
 
         for (const ingredient of recipe){
@@ -266,7 +265,9 @@ class Recipe {
             recipeList.recipeName = ingredient.recipe_name;
             recipeList.prepTime = `${ingredient.prep_time} minutes`; 
             recipeList.cookingTime = `${ingredient.cooking_time} minutes`; 
-            recipeList.image = ingredient.recipe_image; 
+            recipeList.recipeImage = ingredient.recipe_image; 
+            recipeList.mealType = ingredient.meal_type;
+            recipeList.instructions = ingredient.instructions;
 
             const ingredientList =
                 { 
@@ -296,7 +297,7 @@ class Recipe {
      *  [{ id, recipeName, prepTime, cookingTime, recipeImage, mealType,
      *  amount, measurementDescription, ingredientName }]
      */
-    static async getRecipe(id){
+    static async getRecipe(id) {
         
         const response = await db.query(
             `SELECT recipes.id,
@@ -318,10 +319,10 @@ class Recipe {
                   measurement_units ON measurement_units.id = recipe_ingredients.measurement_id
             WHERE recipes.id = $1`,
             [id]);
-        
-        if (!response) throw new NotFoundError(`No recipe: ${id}`);
 
-        const recipe = this._generateRecipe(response.rows);
+        if (!response.rows.length) throw new NotFoundError(`No recipe: ${id}`);
+
+        const recipe = [this._generateRecipe(response.rows)];
 
         return recipe;
     }
@@ -357,7 +358,7 @@ class Recipe {
      * @param {Object} data 
      * @returns 
      */
-    static async updateRecipe(id, data){ 
+    static async updateRecipe(id, data) { 
         const { setCols, values } = sqlForPartialUpdate(
             data,
             {

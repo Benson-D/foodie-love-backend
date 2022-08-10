@@ -122,6 +122,80 @@ describe("create recipes", function() {
     });
 
 })
+/*****************************  Ingrdient Builder *****************************/
+describe("_ingredientBuilder", function() {
+    test("_ingredientBuilder creates recipe", async function() {
+        const recipeList = {
+            ingredient: "ingredient_test",
+            measurement: "cups",
+            amount: 10,
+        }
+
+        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[2]);
+        expect(recipe).toEqual(
+            {
+                recipeId: expect.any(Number),
+                measurementId: expect.any(Number),
+                ingredientId: expect.any(Number),
+                amount: '10'
+            }
+        );
+    });
+
+    test("handles duplicate ingredients", async function() {
+        const recipeList = {
+            ingredient: "ingredient_2",
+            measurement: "oz",
+            amount: 2,
+        }
+
+        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[3]);
+        expect(recipe).toEqual(
+            {
+                recipeId: expect.any(Number),
+                measurementId: expect.any(Number),
+                ingredientId: expect.any(Number),
+                amount: '2'
+            }
+        );
+    });
+
+    test("handles duplicate recipes", async function() {
+        const recipeList = {
+            ingredient: "ingredient_2",
+            measurement: "oz",
+            amount: 2,
+        }
+
+        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[0]);
+        expect(recipe).toEqual(
+            {
+                recipeId: expect.any(Number),
+                measurementId: expect.any(Number),
+                ingredientId: expect.any(Number),
+                amount: '2'
+            }
+        );
+    });
+
+    test("handles empty measurements", async function() {
+        const recipeList = {
+            ingredient: "ingredient_3",
+            measurement: "",
+            amount: 3
+        }
+
+        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[0]);
+        expect(recipe).toEqual(
+            {
+                recipeId: expect.any(Number),
+                measurementId: null,
+                ingredientId: expect.any(Number),
+                amount: '3'
+            }
+        );
+    });
+})
 
 /********************************* findAll ************************************/
 describe("findAll", function() {

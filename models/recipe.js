@@ -127,14 +127,15 @@ class Recipe {
 
         const recipeMeasurement = await this.insertMeasurements(measurement);
         const recipeIngredient = await this.insertIngredients(ingredient);
+        let measurementId;
 
         if (recipeMeasurement) {
-            let recipeMeasurement = recipeMeasurement.id;
+            measurementId = recipeMeasurement.id;
         }
 
         const recipeData = { 
             recipeId: recipeId, 
-            measurementId: recipeMeasurement,
+            measurementId: measurementId,
             ingredientId: recipeIngredient.id, 
             amount: recipeList.amount 
         };

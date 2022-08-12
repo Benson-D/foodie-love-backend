@@ -122,7 +122,7 @@ describe("create recipes", function() {
     });
 
 })
-/*****************************  Ingrdient Builder *****************************/
+/**************************** Ingredient Builder ******************************/
 describe("_ingredientBuilder", function() {
     test("_ingredientBuilder creates recipe", async function() {
         const recipeList = {
@@ -178,7 +178,7 @@ describe("_ingredientBuilder", function() {
         );
     });
 
-    test("handles empty measurements", async function() {
+    test("handles empty measurement", async function() {
         const recipeList = {
             ingredient: "ingredient_3",
             measurement: "",

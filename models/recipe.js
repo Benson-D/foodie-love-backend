@@ -246,7 +246,7 @@ class Recipe {
     }
 
     /**
-     * Given the recipe data, return the recipe for easy format reading ingredients.
+     * Given the recipe data, return the recipe for readable format.
      * @param {*} recipe 
      * @returns {Object} 
      * { id: 0, 
@@ -263,7 +263,7 @@ class Recipe {
      static _generateRecipe(recipe) {
         const recipeList = {};
 
-        for (const ingredient of recipe){
+        for (const ingredient of recipe) {
             recipeList.id = ingredient.id;
             recipeList.recipeName = ingredient.recipe_name;
             recipeList.prepTime = `${ingredient.prep_time} minutes`; 
@@ -280,7 +280,7 @@ class Recipe {
 
                 };
             
-            if(recipeList.ingredients) {
+            if (recipeList.ingredients) {
                 recipeList.ingredients.push(ingredientList);
             } else {
                 recipeList.ingredients = [ingredientList];
@@ -361,29 +361,27 @@ class Recipe {
      * @param {Object} data 
      * @returns 
      */
-    static async updateRecipe(id, data) { 
-        const { setCols, values } = sqlForPartialUpdate(
-            data,
-            {
-                recipeName: "recipe_name",
-                cookingTime: "cooking_time",
-                prepTime: "prep_time",
-                recipeImage: "recipe_image",
-                mealType: "meal_type"
-            });
-
+    static async updateRecipe(id, data) {
+       
+        const columnsToSql = {
+            recipeName: "recipe_name",
+            cookingTime: "cooking_time",
+            prepTime: "prep_time",
+            recipeImage: "recipe_image",
+            mealType: "meal_type"
+        };
+    
+        const { setCols, values } = sqlForPartialUpdate(data, columnsToSql);
         const result = await db.query(
             `UPDATE recipes
-            SET ${setCols}
-            WHERE id = $1
-            RETURNING id, recipe_name AS "recipeName"`,
-            [id, ...values]
-        );
-
+             SET ${setCols}
+             WHERE id = $1
+             RETURNING id, recipe_name AS "recipeName"`,[id, ...values]);
+    
         const recipe = result.rows[0];
-
+    
         if(!recipe) throw new NotFoundError(`No recipe: ${id}`);
-
+    
         return recipe;
     }
 
@@ -397,29 +395,29 @@ class Recipe {
      * @returns 
      */
     static async updateRecipeIngredients(id, data) {
-        const { setCols, values } = sqlForPartialUpdate(
-            data, 
-            {
-                recipeId: "recipe_id",
-                measurementId: "measurement_id", 
-                ingredientId: "ingredient_id",
-            });
 
-            const result = await db.query(
-                `UPDATE recipe_ingredients 
-                SET ${setCols}
-                WHERE recipe_id = $1
-                RETURNING recipe_id AS "recipeId", 
-                          measurement_id AS "measurementId",
-                          ingredient_id AS "ingredientId", 
-                          amount
-            `, [id, ...values]);
+        const columnsToSql =  {
+            recipeId: "recipe_id",
+            measurementId: "measurement_id", 
+            ingredientId: "ingredient_id"
+        };
 
-            const recipeIngredient = result.rows[0];
+        const { setCols, values } = sqlForPartialUpdate(data, columnsToSql);
 
-            if(!recipeIngredient) throw new NotFoundError(`No recipe: ${id}`);
+        const result = await db.query(
+            `UPDATE recipe_ingredients 
+             SET ${setCols}
+             WHERE recipe_id = $1
+             RETURNING recipe_id AS "recipeId", 
+                        measurement_id AS "measurementId",
+                        ingredient_id AS "ingredientId", 
+                        amount`,[id, ...values]);
 
-            return recipeIngredient;
+        const recipeIngredient = result.rows[0];
+
+        if(!recipeIngredient) throw new NotFoundError(`No recipe: ${id}`);
+
+        return recipeIngredient;
     }
 
     /** Delete given recipe from database; returns undefined.

@@ -206,33 +206,33 @@ describe("findAll", function() {
             { 
                 id: recipeIds[0],
                 recipeName: "recipe_1",
-                prep_time: 1,
+                prepTime: 1,
                 cookingTime: 10, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "vegan"
             },
             { 
                 id: recipeIds[1],
                 recipeName: "recipe_2",
-                prep_time: 2,
+                prepTime: 2,
                 cookingTime: 20, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "italian"
             },
             { 
                 id: recipeIds[2],
                 recipeName: "recipe_3",
-                prep_time: 3,
+                prepTime: 3,
                 cookingTime: 30, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "mexican"
             },
             { 
                 id: recipeIds[3],
                 recipeName: "recipe_4",
-                prep_time: 4,
+                prepTime: 4,
                 cookingTime: 40, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "vegan"
             },
         ])
@@ -244,17 +244,17 @@ describe("findAll", function() {
             { 
                 id: recipeIds[0],
                 recipeName: "recipe_1",
-                prep_time: 1,
+                prepTime: 1,
                 cookingTime: 10, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "vegan"
             },
             { 
                 id: recipeIds[1],
                 recipeName: "recipe_2",
-                prep_time: 2,
+                prepTime: 2,
                 cookingTime: 20, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "italian"
             }
         ])
@@ -266,17 +266,17 @@ describe("findAll", function() {
             { 
                 id: recipeIds[0],
                 recipeName: "recipe_1",
-                prep_time: 1,
+                prepTime: 1,
                 cookingTime: 10, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "vegan"
             },
             { 
                 id: recipeIds[3],
                 recipeName: "recipe_4",
-                prep_time: 4,
+                prepTime: 4,
                 cookingTime: 40, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "vegan"
             },
         ])
@@ -288,9 +288,9 @@ describe("findAll", function() {
             { 
                 id: recipeIds[0],
                 recipeName: "recipe_1",
-                prep_time: 1,
+                prepTime: 1,
                 cookingTime: 10, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "vegan"
             },
         ])
@@ -302,17 +302,17 @@ describe("findAll", function() {
             {
                 id: recipeIds[0],
                 recipeName: "recipe_1",
-                prep_time: 1,
+                prepTime: 1,
                 cookingTime: 10, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "vegan" 
             },
             { 
                 id: recipeIds[1],
                 recipeName: "recipe_2",
-                prep_time: 2,
+                prepTime: 2,
                 cookingTime: 20, 
-                recipe_image: null,
+                recipeImage: null,
                 mealType: "italian"
             } 
         ])
@@ -332,7 +332,7 @@ describe("get recipe", function() {
             {
                 id: recipeIds[0],
                 recipeName: "recipe_1",
-                prepTime: '1 minutes',
+                prepTime: '1 minute',
                 cookingTime: '10 minutes', 
                 recipeImage: null,
                 mealType: "vegan",
@@ -358,3 +358,72 @@ describe("get recipe", function() {
     });
 
 });
+/******************************* updateRecipe *********************************/
+describe("update a curent recipe", function() {
+    const updateData = {
+        recipeName: "update_recipe",
+        cookingTime: 10,
+        prepTime: 1,
+        recipeImage: null,
+        instructions: "adding test, update current recipe",
+        mealType: "italian"
+    };
+
+    test("update recipe", async function() {
+        const updateRecipe = await Recipe.updateRecipe(recipeIds[0], updateData);
+        expect(updateRecipe).toEqual({
+            id: recipeIds[0],
+            recipeName: "update_recipe"
+        });
+
+        //Testing recipe updated properly
+        const recipe = await Recipe.getRecipe(recipeIds[0]);
+        expect(recipe).toEqual([
+            {
+                id: recipeIds[0],
+                recipeName: "update_recipe",
+                prepTime: '1 minute',
+                cookingTime: '10 minutes', 
+                recipeImage: null,
+                mealType: "italian",
+                instructions: "adding test, update current recipe",
+                ingredients: [
+                    {
+                        amount: '5', 
+                        measurement: 'measurement_cup',
+                        ingredient: 'ingredient_1'
+                    }
+                ] 
+            },
+        ]);
+    })
+
+    test('not found if no such recipe', async function() {
+        try {
+            await Recipe.updateRecipe(9999, updateData);
+            fail();
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
+}) 
+
+/******************************* deleteRecipe *********************************/
+describe("remove a recipe", function() {
+    test("remove recipe", async function() {
+        await Recipe.removeRecipe(recipeIds[1]);
+
+        //Check if Deleted
+        const recipe = await db.query(`SELECT id FROM recipes WHERE id=${recipeIds[1]}`);
+        expect(recipe.rows.length).toEqual(0);
+    });
+
+    test('not found if no such recipe', async function() {
+        try {
+            await Recipe.removeRecipe(9999);
+            fail();
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
+})

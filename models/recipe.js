@@ -7,15 +7,14 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 /** Related functions for recipes. */
 
 class Recipe {
-    /** Create a recipe (from data), update db, return new recipe data.
+    /** Create a recipe, updates db, return new recipe data.
      * 
-     * data should be { recipeName, prepTime, cookingTime, recipeImage , 
+     * data should be { recipeName, prepTime, cookingTime, recipeImage, 
      * instructions, mealType }
      * 
      * 
      * @param {Object} recipeData 
-     * @return {Promise<string>} JSON 
-     * [{ id }]
+     * @return {Promise<string>} JSON [{ id }]
      */
     static async insertRecipe(recipeData) {
         const { recipeName, prepTime, cookingTime, recipeImage, 
@@ -28,8 +27,7 @@ class Recipe {
                 VALUES
                     ($1, $2, $3, $4, $5, $6)
                 RETURNING id`,
-                [
-                  recipeName, 
+                [ recipeName, 
                   prepTime, 
                   cookingTime, 
                   recipeImage, 
@@ -42,15 +40,14 @@ class Recipe {
         return recipe; 
     }
 
-    /** Create a ingredient (from data), update db, return new ingredient data.
+    /** Create a ingredient, updates db, return new ingredient data.
      * 
-     * data should be { ingredientName }
+     * data should be { ingredientName } 
      * 
      * If ingredient already in database returns that ingredient data
      * 
      * @param {string} ingredientName
-     * @return {Promise<string>} JSON 
-     * [{ id, ingredientName }]
+     * @return {Promise<string>} JSON [{ id, ingredientName }]
      */
     static async insertIngredients(ingredientName) {
         if (typeof ingredientName !== 'string') {
@@ -71,22 +68,21 @@ class Recipe {
             `INSERT INTO ingredients (ingredient_name)
              VALUES ($1)
              RETURNING id, ingredient_name AS "ingredientName"`,
-             [ ingredientName ]);
+             [ingredientName]);
         
         const ingredient = result.rows[0];
 
         return ingredient;
     }
 
-    /** Create a measurement (from data), update db, return new measurement data.
+    /** Create a measurement, updates db, return new measurement data.
      * 
      * data should be { measurementDescription }
      * 
      * If measurement already in database returns that measurement data
      * 
      * @param {string} measurementDescription
-     * @return {Promise<string>} JSON 
-     * [{ id, measurementDescription }]
+     * @return {Promise<string>} JSON [{ id, measurementDescription }]
      */
     static async insertMeasurements(measurementDescription) {
         if(!measurementDescription) return;
@@ -103,9 +99,9 @@ class Recipe {
 
         const result = await db.query(
             `INSERT INTO measurement_units (measurement_description)
-            VALUES ($1)
-            RETURNING id, measurement_description AS "measurement"`,
-            [ measurementDescription ]);
+             VALUES ($1)
+             RETURNING id, measurement_description AS "measurement"`,
+             [measurementDescription]);
 
         const measurement = result.rows[0];
 
@@ -116,6 +112,7 @@ class Recipe {
      * Creates a function to direct the data needed to make measurement,
      * ingredient, and recipe ingredients
      * 
+     * Intended to handle multiple ingredients in a recipe 
      * Measurement can be null, handles case if value is empty
      * 
      * @param {Object} recipeList 
@@ -145,7 +142,7 @@ class Recipe {
 
     }
 
-    /** Create a recipe ingredient (from data), update db, 
+    /** Create a recipe ingredient, updates db, 
      * return new recipe ingredient data.
      * 
      * data should be { recipeId, measurementId, ingredientId, amount }
@@ -158,8 +155,8 @@ class Recipe {
         const { recipeId, measurementId, ingredientId, amount } = recipeData;
 
         const result = await db.query(
-            `INSERT INTO recipe_ingredients (recipe_id, measurement_id,
-                ingredient_id, amount)
+            `INSERT INTO recipe_ingredients 
+                (recipe_id, measurement_id, ingredient_id, amount)
              VALUES ($1, $2, $3, $4)
              RETURNING recipe_id AS "recipeId", measurement_id AS "measurementId",
              ingredient_id AS "ingredientId", amount`,
@@ -235,12 +232,11 @@ class Recipe {
         const recipesResponse = await db.query(
             `SELECT id,
                     recipe_name AS "recipeName",
-                    prep_time,
+                    prep_time AS "prepTime",
                     cooking_time AS "cookingTime",
-                    recipe_image,
+                    recipe_image AS "recipeImage",
                     meal_type AS "mealType"
-            FROM recipes ${whereClaus}
-            `, values);
+            FROM recipes ${whereClaus}`, values);
 
         return recipesResponse.rows;
     }
@@ -264,9 +260,12 @@ class Recipe {
         const recipeList = {};
 
         for (const ingredient of recipe) {
+
+            let minuteStatement = ingredient.prepTime > 1 ? 'minutes' : 'minute';
+
             recipeList.id = ingredient.id;
             recipeList.recipeName = ingredient.recipe_name;
-            recipeList.prepTime = `${ingredient.prep_time} minutes`; 
+            recipeList.prepTime = `${ingredient.prep_time} ${minuteStatement}`; 
             recipeList.cookingTime = `${ingredient.cooking_time} minutes`; 
             recipeList.recipeImage = ingredient.recipe_image; 
             recipeList.mealType = ingredient.meal_type;
@@ -303,25 +302,24 @@ class Recipe {
     static async getRecipe(id) {
         
         const response = await db.query(
-            `SELECT recipes.id,
-                    recipes.recipe_name,
-                    recipes.prep_time,
-                    recipes.cooking_time,
-                    recipes.recipe_image,
-                    recipes.meal_type,
-                    recipes.instructions,
-                    recipe_ingredients.amount,
-                    measurement_units.measurement_description AS "measurement",
+            `SELECT rec.id,
+                    rec.recipe_name,
+                    rec.prep_time,
+                    rec.cooking_time,
+                    rec.recipe_image,
+                    rec.meal_type,
+                    rec.instructions,
+                    ri.amount,
+                    mu.measurement_description AS "measurement",
                     ingredients.ingredient_name
-            FROM recipes
+            FROM recipes rec
                INNER JOIN 
-                  recipe_ingredients ON recipes.id = recipe_ingredients.recipe_id
+                  recipe_ingredients ri ON rec.id = ri.recipe_id
                INNER JOIN 
-                  ingredients ON ingredients.id = recipe_ingredients.ingredient_id
+                  ingredients ON ingredients.id = ri.ingredient_id
                LEFT JOIN 
-                  measurement_units ON measurement_units.id = recipe_ingredients.measurement_id
-            WHERE recipes.id = $1`,
-            [id]);
+                  measurement_units mu ON mu.id = ri.measurement_id
+            WHERE rec.id = $1`,[id]);
 
         if (!response.rows.length) throw new NotFoundError(`No recipe: ${id}`);
 
@@ -342,7 +340,7 @@ class Recipe {
         const result = await db.query( 
             `SELECT ingredient
              FROM ingredients
-             WHERE id = $1`, [id]);
+             WHERE id = $1`,[id]);
         
         if(!result) throw new NotFoundError(`No ingredient: ${id}`); 
 
@@ -375,8 +373,8 @@ class Recipe {
         const result = await db.query(
             `UPDATE recipes
              SET ${setCols}
-             WHERE id = $1
-             RETURNING id, recipe_name AS "recipeName"`,[id, ...values]);
+             WHERE id = $${values.length + 1}
+             RETURNING id, recipe_name AS "recipeName"`,[...values, id]);
     
         const recipe = result.rows[0];
     
@@ -429,10 +427,9 @@ class Recipe {
      static async removeRecipe(id) {
         const result = await db.query(
             `DELETE
-            FROM recipes
-            WHERE id = $1
-            RETURNING id`,
-            [id]);
+             FROM recipes
+             WHERE id = $1
+             RETURNING id`,[id]);
 
         const recipe = result.rows[0];
 
@@ -447,10 +444,9 @@ class Recipe {
     static async removeIngredient(id) {
         const result = await db.query(
             `DELETE
-            FROM ingredients
-            WHERE id = $1
-            RETURNING id`,
-            [id, ...values]);
+             FROM ingredients
+             WHERE id = $1
+             RETURNING id`,[id, ...values]);
 
         const ingredient = result.rows[0];
 

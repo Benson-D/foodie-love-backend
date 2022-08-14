@@ -340,7 +340,9 @@ describe("get recipe", function() {
                 ingredients: [
                     {
                         amount: '5', 
+                        measurementId: measurementIds[0],
                         measurement: 'measurement_cup',
+                        ingredientId: ingredientIds[0],
                         ingredient: 'ingredient_1'
                     }
                 ] 
@@ -390,7 +392,9 @@ describe("update a curent recipe", function() {
                 ingredients: [
                     {
                         amount: '5', 
+                        measurementId: measurementIds[0],
                         measurement: 'measurement_cup',
+                        ingredientId: ingredientIds[0],
                         ingredient: 'ingredient_1'
                     }
                 ] 
@@ -421,6 +425,67 @@ describe("remove a recipe", function() {
     test('not found if no such recipe', async function() {
         try {
             await Recipe.removeRecipe(9999);
+            fail();
+        } catch (err) {
+            expect(err instanceof NotFoundError).toBeTruthy();
+        }
+    });
+})
+
+/************************* deleteRecipeIngredient *****************************/
+describe("remove a recipe ingredient list", function() {
+
+    test("remove list", async function() {
+
+        const recipeData = {
+            recipeId: recipeIds[0],
+            ingredientId: ingredientIds[0],
+            measurementId: measurementIds[0]
+        };
+
+        await Recipe.removeRecipeIngredients(recipeData);
+
+        //Check if Deleted
+        const recipeList = await db.query(
+                    `SELECT recipe_id, 
+                            measurement_id,
+                            ingredient_id
+                    FROM recipe_ingredients 
+                    WHERE recipe_id = ${recipeIds[0]} 
+                        AND measurement_id = ${measurementIds[0]}
+                        AND ingredient_id = ${ingredientIds[0]}`);
+        expect(recipeList.rows.length).toEqual(0);
+    });
+
+    test("remove list with no measurment", async function() {
+        
+        const recipeData = {
+            recipeId: recipeIds[2],
+            ingredientId: ingredientIds[2]
+        };
+
+        await Recipe.removeRecipeIngredients(recipeData);
+
+        //Check if Deleted
+        const recipeList = await db.query(
+                    `SELECT recipe_id, 
+                            measurement_id,
+                            ingredient_id
+                    FROM recipe_ingredients 
+                    WHERE recipe_id = ${recipeIds[2]} 
+                        AND ingredient_id = ${ingredientIds[2]}`);
+        expect(recipeList.rows.length).toEqual(0);
+    });
+
+    test('not found if no such recipe', async function() {
+        const invalidData = {
+            recipeId: 9999,
+            measurementId: 9999,
+            ingredientId: 9999
+        };
+
+        try {
+            await Recipe.removeRecipeIngredients(invalidData);
             fail();
         } catch (err) {
             expect(err instanceof NotFoundError).toBeTruthy();

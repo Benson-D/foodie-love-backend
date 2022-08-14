@@ -243,6 +243,7 @@ class Recipe {
 
     /**
      * Given the recipe data, return the recipe for readable format.
+     * 
      * @param {*} recipe 
      * @returns {Object} 
      * { id: 0, 
@@ -274,7 +275,9 @@ class Recipe {
             const ingredientList =
                 { 
                     amount: ingredient.amount,
+                    measurementId: ingredient.measurementId,
                     measurement: ingredient.measurement,
+                    ingredientId: ingredient.ingredientId,
                     ingredient: ingredient.ingredient_name,
 
                 };
@@ -310,7 +313,9 @@ class Recipe {
                     rec.meal_type,
                     rec.instructions,
                     ri.amount,
+                    mu.id AS "measurementId",
                     mu.measurement_description AS "measurement",
+                    ingredients.id AS "ingredientId",
                     ingredients.ingredient_name
             FROM recipes rec
                INNER JOIN 
@@ -347,6 +352,32 @@ class Recipe {
         const ingredient = result.rows[0];
 
         return ingredient;
+    }
+
+    static async delegateUpdates(id, data) {
+        const ingredientList = data?.ingredients; 
+
+        delete data?.ingredients; 
+
+        await this.updateRecipe(id, data); 
+
+        if (ingredientList.length) {
+            await Promise.all(ingredientList.map( async (recipeList) => {
+                const response = await db.query(
+                    `SELECT recipe_id, 
+                            measurement_id,
+                            ingredient_id
+                    FROM recipe_ingredients 
+                    WHERE recipe_id = $1 AND measurement_id = $2 AND ingredient_id = $3`,
+                    [id, recipeList?.measurementId, recipeList.ingredientId]);
+
+                if(!response) {
+                    await Recipe._ingredientBuilder(recipeList, id)
+                }
+
+            }));
+        }
+        return data;
     }
 
     /**
@@ -405,11 +436,11 @@ class Recipe {
         const result = await db.query(
             `UPDATE recipe_ingredients 
              SET ${setCols}
-             WHERE recipe_id = $1
+             WHERE recipe_id = $${values.length + 1}
              RETURNING recipe_id AS "recipeId", 
                         measurement_id AS "measurementId",
                         ingredient_id AS "ingredientId", 
-                        amount`,[id, ...values]);
+                        amount`,[...values, id]);
 
         const recipeIngredient = result.rows[0];
 
@@ -451,6 +482,34 @@ class Recipe {
         const ingredient = result.rows[0];
 
         if (!ingredient) throw new NotFoundError(`No ingredient: ${id}`);
+    }
+
+    /** Delete given ingredient from database; returns undefined.
+     * 
+     * Throws NotFoundError if ingredient not found.
+     * @param {Number} id 
+     */
+     static async removeRecipeIngredients(data) {
+
+        const columnsToSql = {
+            recipeId: "recipe_id",
+            measurementId: "measurement_id",
+            ingredientId: "ingredient_id"
+        };
+
+        const { setCols, values } = sqlForPartialUpdate(data, columnsToSql);
+        const deleteCols = setCols.split(',');
+
+        const result = await db.query(
+            `DELETE
+             FROM recipe_ingredients
+             WHERE ${deleteCols.join(' AND ')}
+             RETURNING recipe_id`,[...values]);
+
+        const recipeIngredient = result.rows[0];
+       
+
+        if (!recipeIngredient) throw new NotFoundError(`No recipeIngredient`);
     }
 
 }

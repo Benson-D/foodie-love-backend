@@ -160,24 +160,6 @@ describe("_ingredientBuilder", function() {
         );
     });
 
-    test("handles duplicate recipes", async function() {
-        const recipeList = {
-            ingredient: "ingredient_2",
-            measurement: "oz",
-            amount: 2,
-        }
-
-        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[0]);
-        expect(recipe).toEqual(
-            {
-                recipeId: expect.any(Number),
-                measurementId: expect.any(Number),
-                ingredientId: expect.any(Number),
-                amount: '2'
-            }
-        );
-    });
-
     test("handles empty measurement", async function() {
         const recipeList = {
             ingredient: "ingredient_3",
@@ -195,6 +177,22 @@ describe("_ingredientBuilder", function() {
             }
         );
     });
+
+    test("handles invalid recipe ids", async function() {
+        const recipeList = {
+            ingredient: "ingredient_5",
+            measurement: "oz",
+            amount: 8,
+        }
+
+        try {
+            await Recipe._ingredientBuilder(recipeList, null);
+            fail();
+        } catch (err) {
+            expect(err instanceof BadRequestError).toBeTruthy();
+        }
+    });
+
 })
 
 /********************************* findAll ************************************/

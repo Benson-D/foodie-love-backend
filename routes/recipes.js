@@ -89,6 +89,15 @@ router.get("/:id", async function (req, res) {
     return res.json({ recipe });
 });
 
+
+/** PATCH /[id] 
+ * 
+ */
+router.patch("/:id", async function(req, res, next) {
+    const recipe = await Recipe.handleUpdates(req.params.id, req.body);
+    return res.json({ recipe });
+})
+
 /** DELETE /[id] => { deleted: id } 
  * 
  */

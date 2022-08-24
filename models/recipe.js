@@ -120,6 +120,10 @@ class Recipe {
      * @returns {Promise<string>} JSON 
      */
     static async _ingredientBuilder(recipeList, recipeId) {
+        if (typeof recipeId !== 'number') {
+            throw new BadRequestError('Not a valid id');
+        }
+
         const { measurement, ingredient } = recipeList;
 
         const recipeMeasurement = await this.insertMeasurements(measurement);
@@ -354,7 +358,7 @@ class Recipe {
         return ingredient;
     }
 
-    static async delegateUpdates(id, data) {
+    static async handleUpdates(id, data) {
         const ingredientList = data?.ingredients; 
 
         delete data?.ingredients; 

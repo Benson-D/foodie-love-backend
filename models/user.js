@@ -60,7 +60,7 @@ class User {
     * If new user registers into the database with hashed credentials 
     * 
     * @param {*} userData 
-    * @returns {Array} [{ username, firstName, lastName, email, isAdmin }]
+    * @return {Promise<string>} [{ username, firstName, lastName, email, isAdmin }]
     */
    static async register( userData ) {
    

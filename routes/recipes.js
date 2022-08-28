@@ -68,7 +68,7 @@ router.get("/", async function (req, res) {
         throw new BadRequestError(errs);
     }
 
-    if (recipeQuery.cookingTime !== undefined) {
+    if (recipeQuery?.cookingTime) {
         recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
     };
 
@@ -84,7 +84,6 @@ router.get("/", async function (req, res) {
  * Authorization required: none
  */
 router.get("/:id", async function (req, res) {
-
     const recipe = await Recipe.getRecipe(req.params.id);
     return res.json({ recipe });
 });
@@ -93,7 +92,7 @@ router.get("/:id", async function (req, res) {
 /** PATCH /[id] 
  * 
  */
-router.patch("/:id", async function(req, res, next) {
+router.patch("/:id", async function(req, res) {
     const recipe = await Recipe.handleUpdates(req.params.id, req.body);
     return res.json({ recipe });
 })
@@ -103,7 +102,6 @@ router.patch("/:id", async function(req, res, next) {
  */
 router.delete("/:id", async function (req, res) {
     await Recipe.removeRecipe(req.params.id);
-    
     return res.json({ deleted: req.params.id });
 })
 

@@ -58,13 +58,14 @@ describe("create recipes", function() {
             })
     });
 
-    test("handle duplicate ingredients", async function() {
-        const ingredient = await Recipe.insertIngredients('ingredient_1');
-        expect(ingredient).toEqual({
-            id: expect.any(Number),
-            ingredientName: 'ingredient_1'
-        })
-       
+    test("return an existing ingredient", async function() {
+        let ingredient = await Recipe.insertIngredients('ingredient_1');
+        expect(ingredient).toEqual(
+            {
+                id: ingredientIds[0],
+                ingredientName: 'ingredient_1'
+            }
+        )
     });
 
     test("handle non string ingredient value", async function() {
@@ -77,15 +78,6 @@ describe("create recipes", function() {
        
     });
 
-    test("return an existing ingredient", async function() {
-        let ingredient = await Recipe.insertIngredients('ingredient_1');
-        expect(ingredient).toEqual(
-            {
-                id: ingredientIds[0],
-                ingredientName: 'ingredient_1'
-            }
-        )
-    });
 
     test("create measurement", async function() {
         let measurement = await Recipe.insertMeasurements('test_measurement');
@@ -121,6 +113,25 @@ describe("create recipes", function() {
         );
     });
 
+    test("create recipe ingredient with empty measurement", async function() {
+        let recipeIngredient = await Recipe.insertRecipeIngredients(
+            {
+                recipeId: recipeIds[3],
+                measurementId: '',
+                ingredientId: ingredientIds[2],
+                amount: 2
+            }
+        );
+        expect(recipeIngredient).toEqual(
+            {
+                recipeId: recipeIds[3],
+                measurementId: null,
+                ingredientId: ingredientIds[2],
+                amount: "2"
+            }
+        );
+    });
+
 })
 /**************************** Ingredient Builder ******************************/
 describe("_ingredientBuilder", function() {
@@ -138,24 +149,6 @@ describe("_ingredientBuilder", function() {
                 measurementId: expect.any(Number),
                 ingredientId: expect.any(Number),
                 amount: '10'
-            }
-        );
-    });
-
-    test("handles duplicate ingredients", async function() {
-        const recipeList = {
-            ingredient: "ingredient_2",
-            measurement: "oz",
-            amount: 2,
-        }
-
-        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[3]);
-        expect(recipe).toEqual(
-            {
-                recipeId: expect.any(Number),
-                measurementId: expect.any(Number),
-                ingredientId: expect.any(Number),
-                amount: '2'
             }
         );
     });

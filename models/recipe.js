@@ -158,13 +158,19 @@ class Recipe {
     static async insertRecipeIngredients(recipeData) {
         const { recipeId, measurementId, ingredientId, amount } = recipeData;
 
+        let recipeMeasurement;
+
+        if (measurementId) {
+            recipeMeasurement = measurementId;
+        }
+
         const result = await db.query(
             `INSERT INTO recipe_ingredients 
                 (recipe_id, measurement_id, ingredient_id, amount)
              VALUES ($1, $2, $3, $4)
              RETURNING recipe_id AS "recipeId", measurement_id AS "measurementId",
              ingredient_id AS "ingredientId", amount`,
-             [ recipeId, measurementId, ingredientId, amount ]);
+             [ recipeId, recipeMeasurement, ingredientId, amount ]);
         
         const recipeIngredient = result.rows[0];
 
@@ -358,29 +364,40 @@ class Recipe {
         return ingredient;
     }
 
-    static async handleUpdates(id, data) {
+    static async handleUpdates(recipeId, data) {
         const ingredientList = data?.ingredients; 
 
         delete data?.ingredients; 
 
-        await this.updateRecipe(id, data); 
+        const updatedRecipe = await this.updateRecipe(recipeId, data); 
 
-        if (ingredientList.length) {
+        if (updatedRecipe && ingredientList.length) {
             await Promise.all(ingredientList.map( async (recipeList) => {
+
+                let updateWhere = ''; 
+                let values = [recipeId, recipeList.ingredientId];
+
+                if (recipeList?.measurementId) {
+                    updateWhere = ' AND measurement_id = $3';
+                    values.push(recipeList.measurementId);
+                }
+
                 const response = await db.query(
                     `SELECT recipe_id, 
                             measurement_id,
                             ingredient_id
                     FROM recipe_ingredients 
-                    WHERE recipe_id = $1 AND measurement_id = $2 AND ingredient_id = $3`,
-                    [id, recipeList?.measurementId, recipeList.ingredientId]);
+                    WHERE recipe_id = $1 AND ingredient_id = $2 ${updateWhere}`,
+                    [...values]);
 
-                if(!response) {
-                    await Recipe._ingredientBuilder(recipeList, id)
+                if (response) {
+                    await this.updateRecipeIngredients(recipeList, recipeId);
                 }
-
+                
             }));
         }
+
+
         return data;
     }
 

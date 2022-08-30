@@ -35,13 +35,12 @@ router.post("/", upload.single('recipeImage'), async function (req, res) {
 
     req.body.recipeImage = await uploadRecipeImage(req.file); 
         
-    let recipe = await Recipe.insertRecipe(req.body);
-    
-    const recipeList = await Promise.all(ingredientList.map( async (recipeList) => {
-        return await Recipe._ingredientBuilder(recipeList, recipe.id)
-    }));
+    const recipe = await Recipe.insertRecipe(req.body);
 
-    return res.status(201).json({ recipeList });
+    recipe.ingredients = await Promise.all(ingredientList.map( 
+        async (list) => await Recipe._ingredientBuilder(list, recipe.id)));
+    
+    return res.status(201).json({ recipe });
 
 });
 

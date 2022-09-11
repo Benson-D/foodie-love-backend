@@ -78,7 +78,6 @@ describe("create recipes", function() {
        
     });
 
-
     test("create measurement", async function() {
         let measurement = await Recipe.insertMeasurements('test_measurement');
         expect(measurement).toEqual(

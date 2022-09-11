@@ -7,14 +7,14 @@ const multer  = require('multer')
 
 const { BadRequestError } = require("../expressError");
 const { uploadRecipeImage } = require("../aws/s3");
-const Recipe= require("../models/recipe");
+const Recipe = require("../models/recipe");
 
 const recipeNewSchema = require("../schemas/recipeNew.json");
 const recipeSearchSchema = require("../schemas/recipeSearch.json");
+const upload = multer({ dest: "uploads/"});
 
 const router = new express.Router();
 
-const upload = multer({ dest: "uploads/"});
 
 /** POST / { recipe } =>  { recipe }
  * 
@@ -23,15 +23,15 @@ const upload = multer({ dest: "uploads/"});
  *        req.fle: { recipeImage } 
  * 
  */
-router.post("/", upload.single('recipeImage'), async function (req, res) {
+router.post("/", upload.single('recipeImage'), async function (req, res, next) {
     const validator = jsonschema.validate(req.body, recipeNewSchema);
 
     if(!validator.valid) {
         const errs = validator.errors.map(e => e.stack);
-        throw new BadRequestError(errs);
+        return res.status(400).json({ errors: errs });
     }
 
-    const { ingredientList } = req.body;
+    const { ingredientList } = req.body; 
 
     req.body.recipeImage = await uploadRecipeImage(req.file); 
         
@@ -64,7 +64,7 @@ router.get("/", async function (req, res) {
 
     if (!validator.valid) {
         const errs = validator.errors.map(e => e.stack);
-        throw new BadRequestError(errs);
+        return res.status(400).json({ errors: errs });
     }
 
     if (recipeQuery?.cookingTime) {

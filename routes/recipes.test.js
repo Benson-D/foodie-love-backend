@@ -18,6 +18,7 @@ beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);
 afterAll(commonAfterAll);
 
+/***************************** POST /recipes **********************************/
 describe("POST /recipes ", function() {
     const recipe = {
         recipeName: "recipe_test",
@@ -49,10 +50,22 @@ describe("POST /recipes ", function() {
         ]
     };
 
-    test("ok status with empty ingredients", async function() {
+    test("bad request with invalid data", async function() {
+        
         const response = await request(app)
             .post("/recipes")
-            .send(recipe);
+            .send({
+                recipeName: "recipe_fail",
+                prepTime: 1,
+                instructions: '',
+                mealType: 'barbeque',
+            });
+
+        expect(response.statusCode).toEqual(400);
+    });
+
+    test("ok status with empty ingredients", async function() {
+        const response = await request(app).post("/recipes").send(recipe);
 
         expect(response.statusCode).toEqual(201);
         expect(response.body).toEqual({ 
@@ -94,4 +107,46 @@ describe("POST /recipes ", function() {
             }
         });
     });
-})
+
+    
+});
+
+describe("GET / recipes", function() {
+    test("ok for find all recipes", async function() {
+        const response = await request(app).get('/recipes');
+        expect(response.body).toEqual({ 
+            recipes: [ {
+                id: expect.any(Number),
+                recipeName: "recipe_1",
+                prepTime: 1,
+                cookingTime: 10,
+                recipeImage: null,
+                mealType: "vegan"
+            }, 
+            { 
+                id: expect.any(Number),
+                recipeName: "recipe_2",
+                prepTime: 2,
+                cookingTime: 20, 
+                recipeImage: null,
+                mealType: "italian"
+            },         
+            { 
+                id: expect.any(Number),
+                recipeName: "recipe_3",
+                prepTime: 3,
+                cookingTime: 30, 
+                recipeImage: null,
+                mealType: "mexican"
+            } 
+        ]})
+    });
+
+    test("bad request if invalid filter key", async function () {
+        const response = await request(app)
+            .get("/recipes")
+            .query({ fail: "fail search" });
+        expect(response.statusCode).toEqual(400);
+      });
+});
+

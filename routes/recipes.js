@@ -13,6 +13,10 @@ const recipeNewSchema = require("../schemas/recipeNew.json");
 const recipeSearchSchema = require("../schemas/recipeSearch.json");
 const upload = multer({ dest: "uploads/"});
 
+const fs = require("fs");
+const util = require("utl");
+const unlinkFile = util.promisify(fs.unlink);
+
 const router = new express.Router();
 
 
@@ -34,6 +38,9 @@ router.post("/", upload.single('recipeImage'), async function (req, res, next) {
     const { ingredientList } = req.body; 
 
     req.body.recipeImage = await uploadRecipeImage(req.file); 
+
+    //Remove Path
+    await unlinkFile(req.file.path);
         
     const recipe = await Recipe.insertRecipe(req.body);
 

@@ -41,6 +41,21 @@ async function uploadRecipeImage(file) {
     return imageUrl.Location;
 }
 
+/**
+ * Downloads a file directly from s3
+ * @param {*} fileKey 
+ * @returns 
+ */
+function getRecipeImage(fileKey) {
+    const downloadParams = {
+        Key: fileKey,
+        Bucket: bucketName
+    }
+
+    return s3.getObject(downloadParams).createReadStream();
+}
+
 module.exports = {
-    uploadRecipeImage
+    uploadRecipeImage,
+    getRecipeImage
 };

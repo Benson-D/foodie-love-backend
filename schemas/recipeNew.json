@@ -18,6 +18,9 @@
       "mealType": {
         "type": "string"
       },
+      "recipeImage": {
+        "type": "string"
+      },
       "ingredientList": {
           "type": "array"
       }

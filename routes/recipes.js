@@ -14,7 +14,7 @@ const recipeSearchSchema = require("../schemas/recipeSearch.json");
 const upload = multer({ dest: "uploads/"});
 
 const fs = require("fs");
-const util = require("utl");
+const util = require("util");
 const unlinkFile = util.promisify(fs.unlink);
 
 const router = new express.Router();
@@ -37,11 +37,6 @@ router.post("/", upload.single('recipeImage'), async function (req, res, next) {
 
     const { ingredientList } = req.body; 
 
-    req.body.recipeImage = await uploadRecipeImage(req.file); 
-
-    //Remove Path
-    await unlinkFile(req.file.path);
-        
     const recipe = await Recipe.insertRecipe(req.body);
 
     recipe.ingredients = await Promise.all(ingredientList.map( 
@@ -50,6 +45,15 @@ router.post("/", upload.single('recipeImage'), async function (req, res, next) {
     return res.status(201).json({ recipe });
 
 });
+
+router.post("/image", upload.single('recipeImage'), async function(req, res) {
+    const image = req.file || '';
+    const urlResponse = await uploadRecipeImage(image);
+
+    if (image) await unlinkFile(image.path);
+
+    return res.status(201).json({ url: urlResponse });
+}); 
 
 /** GET / =>  
  *

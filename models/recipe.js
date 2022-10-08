@@ -28,8 +28,8 @@ class Recipe {
                     ($1, $2, $3, $4, $5, $6)
                 RETURNING id`,
                 [ recipeName, 
-                  prepTime, 
-                  cookingTime, 
+                  parseInt(prepTime), 
+                  parseInt(cookingTime), 
                   recipeImage, 
                   instructions, 
                   mealType
@@ -124,7 +124,14 @@ class Recipe {
             throw new BadRequestError('Not a valid id');
         }
 
-        const { measurement, ingredient } = recipeList;
+        const { amount, measurement, ingredient } = recipeList;
+
+        let recipeAmount = amount; 
+        if (recipeAmount.includes('/')) {
+            recipeAmount = recipeAmount
+                                    .split('/')
+                                    .reduce((total, number) => +total / +number);
+        }
 
         const recipeMeasurement = await this.insertMeasurements(measurement);
         const recipeIngredient = await this.insertIngredients(ingredient);
@@ -138,7 +145,7 @@ class Recipe {
             recipeId: recipeId, 
             measurementId: measurementId,
             ingredientId: recipeIngredient.id, 
-            amount: recipeList.amount 
+            amount: parseFloat(recipeAmount) 
         };
 
         const result = await this.insertRecipeIngredients(recipeData);

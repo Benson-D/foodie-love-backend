@@ -27,19 +27,21 @@ const router = new express.Router();
  *        req.fle: { recipeImage } 
  * 
  */
-router.post("/", upload.single('recipeImage'), async function (req, res, next) {
+router.post("/", async function (req, res, next) {
     const validator = jsonschema.validate(req.body, recipeNewSchema);
 
     if(!validator.valid) {
         const errs = validator.errors.map(e => e.stack);
+        console.log(errs, 'error');
         return res.status(400).json({ errors: errs });
     }
 
-    const { ingredientList } = req.body; 
-
     const recipe = await Recipe.insertRecipe(req.body);
+    
+    const { ingredientList } = req.body; 
+    const recipeIngregients = JSON.parse(ingredientList);
 
-    recipe.ingredients = await Promise.all(ingredientList.map( 
+    recipe.ingredients = await Promise.all(recipeIngregients.map( 
         async (list) => await Recipe._ingredientBuilder(list, recipe.id)));
     
     return res.status(201).json({ recipe });

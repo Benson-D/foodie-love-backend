@@ -1,9 +1,9 @@
 "use strict";
 
-const db = require("../db.js");
-const Recipe = require("../models/recipe");
-const User = require("../models/user");
-const { createToken } = require("../helpers/token");
+const db = require("../../config/db.js");
+const Recipe = require("../../models/recipe.js");
+const User = require("../../models/user.js");
+const { createToken } = require("../../utils/token");
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere

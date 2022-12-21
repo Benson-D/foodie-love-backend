@@ -4,9 +4,9 @@
 const jsonschema = require("jsonschema");
 const express = require("express");
 
-const { BadRequestError } = require("../expressError");
+const { BadRequestError } = require("../error/expressError");
 const User = require("../models/user");
-const { createToken } = require("../helpers/tokens");
+const { createToken } = require("../utils/tokens");
 const { router } = require("../app");
 
 router.post("/", async function (req, res, next) {

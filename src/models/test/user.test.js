@@ -4,10 +4,10 @@ const {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
-} = require("../expressError");
+} = require("../../error/expressError");
 
-const db = require("../db.js");
-const User = require("./user.js");
+const db = require("../../config/db.js");
+const User = require("../user.js");
 
 const {
   commonBeforeAll,

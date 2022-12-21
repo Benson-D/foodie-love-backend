@@ -7,10 +7,10 @@
         "type": "string"
       },
       "prepTime": {
-        "type": "string"
+        "type": "number"
       },
       "cookingTime": {
-        "type": "string"
+        "type": "number"
       },
       "instructions": {
         "type": "string"

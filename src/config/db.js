@@ -1,7 +1,6 @@
 "use strict";
 
 /** Database setup for foodie-love. */
-
 const { Client } = require("pg");
 const { getDatabaseUri } = require("./config");
 

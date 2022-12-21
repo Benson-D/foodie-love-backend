@@ -1,8 +1,9 @@
 "use strict";
 
+const { json } = require("express");
 const request = require("supertest");
 
-const app = require("../app");
+const app = require("../../app.js");
 
 const {
   commonBeforeAll,
@@ -26,7 +27,7 @@ describe("POST /recipes ", function() {
         cookingTime: 10, 
         instructions: 'this is a test recipe, this is testing routes creation',
         mealType: "vegan",
-        ingredientList: []
+        ingredientList: JSON.stringify([])
     }; 
 
     const recipe1 = {
@@ -35,19 +36,19 @@ describe("POST /recipes ", function() {
         cookingTime: 10, 
         instructions: 'this is a test recipe, this is testing routes creation',
         mealType: "vegan",
-        ingredientList: [
+        ingredientList: JSON.stringify([
             {
                 ingredient: 'tomato',
                 measurement: 'cup',
-                amount: 2
+                amount: '2'
             },
             {
                 ingredient: 'fish',
                 measurement: '',
-                amount: 1
+                amount: '1'
             }
 
-        ]
+        ])
     };
 
     test("bad request with invalid data", async function() {

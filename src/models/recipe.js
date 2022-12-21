@@ -1,8 +1,8 @@
 "use strict";
 
-const db = require("../db");
-const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const db = require("../config/db");
+const { BadRequestError, NotFoundError } = require("../error/expressError");
+const { sqlForPartialUpdate } = require("../utils/sql");
 
 /** Related functions for recipes. */
 

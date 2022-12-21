@@ -5,9 +5,9 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 const multer  = require('multer')
 
-const { BadRequestError } = require("../expressError");
+const { BadRequestError } = require("../error/expressError");
 const { uploadRecipeImage } = require("../aws/s3");
-const Recipe = require("../models/recipe");
+const Recipe = require("../models/recipe.js");
 
 const recipeNewSchema = require("../schemas/recipeNew.json");
 const recipeSearchSchema = require("../schemas/recipeSearch.json");

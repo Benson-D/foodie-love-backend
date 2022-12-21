@@ -1,7 +1,6 @@
 const request = require("supertest");
-
-const app = require("./app");
-const db = require("./db");
+const app = require("../app");
+const db = require("../config/db.js");
 
 describe("test connection of app", function() {
     test("not found site 404", async function() {

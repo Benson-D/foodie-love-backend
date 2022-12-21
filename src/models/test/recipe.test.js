@@ -1,8 +1,8 @@
 "use strict";
 
-const db = require("../db.js");
-const { BadRequestError, NotFoundError } = require("../expressError");
-const Recipe = require("./recipe.js");
+const db = require("../../config/db.js");
+const { BadRequestError, NotFoundError } = require("../../error/expressError");
+const Recipe = require("../recipe.js");
 
 const {
     commonBeforeAll,
@@ -138,7 +138,7 @@ describe("_ingredientBuilder", function() {
         const recipeList = {
             ingredient: "ingredient_test",
             measurement: "cups",
-            amount: 10,
+            amount: '10',
         }
 
         const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[2]);
@@ -156,7 +156,7 @@ describe("_ingredientBuilder", function() {
         const recipeList = {
             ingredient: "ingredient_3",
             measurement: "",
-            amount: 3
+            amount: '3'
         }
 
         const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[0]);

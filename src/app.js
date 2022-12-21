@@ -1,12 +1,10 @@
 "use strict";
 
 /** Express app for foodie-love. */
-
 const express = require("express");
 const cors = require("cors");
 
-const { NotFoundError } = require("./expressError");
-
+const { NotFoundError } = require("./error/expressError");
 const recipeRoutes = require("./routes/recipes");
 
 const app = express();

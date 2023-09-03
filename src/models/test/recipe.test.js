@@ -318,7 +318,7 @@ describe("findAll", function() {
 describe("get recipe", function() {
     test('finds a recipe', async function() {
         const recipe = await Recipe.getRecipe(recipeIds[0]);
-        expect(recipe).toEqual([
+        expect(recipe).toEqual(
             {
                 id: recipeIds[0],
                 recipeName: "recipe_1",
@@ -337,7 +337,7 @@ describe("get recipe", function() {
                     }
                 ] 
             },
-        ])  
+        )  
     });
 
     test('not found if no such recipe', async function() {

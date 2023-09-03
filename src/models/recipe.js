@@ -348,7 +348,7 @@ class Recipe {
 
         if (!response.rows.length) throw new NotFoundError(`No recipe: ${id}`);
 
-        const recipe = [this._generateRecipe(response.rows)];
+        const recipe = this._generateRecipe(response.rows);
 
         return recipe;
     }

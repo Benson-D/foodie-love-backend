@@ -253,7 +253,9 @@ class Recipe {
                     cooking_time AS "cookingTime",
                     recipe_image AS "recipeImage",
                     meal_type AS "mealType"
-            FROM recipes ${whereClaus}`, values);
+            FROM recipes ${whereClaus}
+            ORDER BY id 
+            LIMIT 10`, values);
 
         return recipesResponse.rows;
     }

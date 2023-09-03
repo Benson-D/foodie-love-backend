@@ -11,6 +11,9 @@
       },
       "mealType": {
         "type": "string"
+      },
+      "skip": {
+        "type": "number"
       }
     },
     "additionalProperties": false,

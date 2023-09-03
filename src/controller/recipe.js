@@ -1,7 +1,4 @@
 const jsonschema = require("jsonschema");
-const express = require("express");
-
-const { BadRequestError } = require("../error/expressError");
 const { uploadRecipeImage } = require("../aws/s3");
 const Recipe = require("../models/recipe.js");
 
@@ -41,6 +38,12 @@ async function recipeGet(req, res) {
     if (recipeQuery?.cookingTime) {
         recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
     };
+
+    if (recipeQuery?.skip) {
+        recipeQuery.skip = Number(recipeQuery.skip);
+    } else {
+        recipeQuery['skip'] = 0;
+    }
 
     const recipes = await Recipe.findAll(recipeQuery);
     return res.json({ recipes });

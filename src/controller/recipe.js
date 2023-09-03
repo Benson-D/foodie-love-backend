@@ -28,21 +28,21 @@ async function recipeCreate(req, res, next) {
 async function recipeGet(req, res) {
     const recipeQuery = req.query; 
 
+    if (recipeQuery?.skip) {
+        recipeQuery.skip = Number(recipeQuery.skip);
+    } else {
+        recipeQuery['skip'] = 0;
+    }
+    
+    if (recipeQuery?.cookingTime) {
+        recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
+    };
+
     const validator = jsonschema.validate(recipeQuery, recipeSearchSchema);
 
     if (!validator.valid) {
         const errs = validator.errors.map(e => e.stack);
         return res.status(400).json({ errors: errs });
-    }
-
-    if (recipeQuery?.cookingTime) {
-        recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
-    };
-
-    if (recipeQuery?.skip) {
-        recipeQuery.skip = Number(recipeQuery.skip);
-    } else {
-        recipeQuery['skip'] = 0;
     }
 
     const recipes = await Recipe.findAll(recipeQuery);

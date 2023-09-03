@@ -240,7 +240,7 @@ class Recipe {
      * [{id, recipeName, cookingTime, recipeImage, mealType }]
      */
     static async findAll(searchFilters = {}) { 
-        const { recipeName, cookingTime, mealType } = searchFilters;
+        const { recipeName, cookingTime, mealType, skip } = searchFilters;
 
         const { whereClaus, values } = this._filterWhereBuilder({
             recipeName, cookingTime, mealType
@@ -255,7 +255,8 @@ class Recipe {
                     meal_type AS "mealType"
             FROM recipes ${whereClaus}
             ORDER BY id 
-            LIMIT 10`, values);
+            LIMIT 10
+            OFFSET $${values.length + 1}`, [...values, skip]);
 
         return recipesResponse.rows;
     }

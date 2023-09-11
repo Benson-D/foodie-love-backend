@@ -4,7 +4,7 @@
 const express = require("express");
 const cors = require("cors");
 
-const { NotFoundError } = require("./error/expressError");
+const { NotFoundError } = require("./utils/expressError");
 const recipeRoutes = require("./routes/recipes");
 
 const app = express();

@@ -20,7 +20,7 @@ const s3 = new AWS.S3({
  * @param {*} file 
  * @return { Promise<string> } JSON 
  */
-async function uploadRecipeImage(file) {
+async function uploadImageToS3(file) {
    if(!file) return;
 
     console.debug({ file }, "debug file case");
@@ -56,6 +56,6 @@ function getRecipeImage(fileKey) {
 }
 
 module.exports = {
-    uploadRecipeImage,
+    uploadImageToS3,
     getRecipeImage
 };

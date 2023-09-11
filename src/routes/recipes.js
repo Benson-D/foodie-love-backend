@@ -5,7 +5,7 @@ const express = require("express");
 const multer  = require('multer')
 const { 
     recipeCreate, 
-    recipeGet, 
+    recipeGetAll, 
     recipeGetIndividual, 
     recipeUploadPhoto,
     recipeUpdate,
@@ -14,6 +14,7 @@ const {
 
 const upload = multer({ dest: "uploads/"});
 const router = new express.Router();
+
 
 /** POST / { recipe } =>  { recipe }
  * 
@@ -32,14 +33,14 @@ router.post("/image", upload.single('recipeImage'), recipeUploadPhoto);
  * ... ]}
  * 
  * Can filter on provided search filters:
- *  - recipeName (will find case-insensitive, partial matches)
+ *  - recipeName (will find case-insensitxive, partial matches)
  *  - mealType 
  *  - cookingTime
  * 
  * Authorization required: none
  * 
  */
-router.get("/", recipeGet);
+router.get("/", recipeGetAll);
 
 /** GET /[id]  =>  { recipe }
  *

@@ -1,7 +1,7 @@
 "use strict";
 
-const db = require("../../config/db.js");
-const Recipe = require("../../models/recipe.js");
+const db = require("../../configs/db.js");
+const RecipeModel = require("../../models/RecipeModel.js");
 const User = require("../../models/user.js");
 const { createToken } = require("../../utils/token");
 
@@ -15,7 +15,7 @@ async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
   await db.query("DELETE FROM users"); 
   
-    await Recipe.insertRecipe(
+    await RecipeModel.insertRecipe(
         { 
             recipeName: "recipe_1",
             prepTime: 1,
@@ -25,7 +25,7 @@ async function commonBeforeAll() {
             mealType: "vegan"
         });
 
-    await Recipe.insertRecipe(
+    await RecipeModel.insertRecipe(
         { 
             recipeName: "recipe_2",
             prepTime: 2,
@@ -34,7 +34,7 @@ async function commonBeforeAll() {
             recipeImage: null,
             mealType: "italian"
         });
-    await Recipe.insertRecipe(
+    await RecipeModel.insertRecipe(
         { 
             recipeName: "recipe_3",
             prepTime: 3,

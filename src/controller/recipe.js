@@ -1,6 +1,6 @@
 const jsonschema = require("jsonschema");
-const { uploadRecipeImage } = require("../aws/s3");
-const Recipe = require("../models/recipe.js");
+const { uploadImageToS3 } = require("../aws/s3");
+const RecipeModel = require("../models/RecipeModel.js");
 
 const recipeNewSchema = require("../schemas/recipeNew.json");
 const recipeSearchSchema = require("../schemas/recipeSearch.json");
@@ -14,18 +14,18 @@ async function recipeCreate(req, res, next) {
         return res.status(400).json({ errors: errs });
     }
 
-    const recipe = await Recipe.insertRecipe(req.body);
+    const recipe = await RecipeModel.insertRecipe(req.body);
     
     const { ingredientList } = req.body; 
     const recipeIngregients = JSON.parse(ingredientList);
 
     recipe.ingredients = await Promise.all(recipeIngregients.map( 
-        async (list) => await Recipe._ingredientBuilder(list, recipe.id)));
+        async (list) => await RecipeModel._ingredientBuilder(list, recipe.id)));
     
     return res.status(201).json({ recipe });
 }
 
-async function recipeGet(req, res) {
+async function recipeGetAll(req, res) {
     const recipeQuery = req.query; 
 
     if (recipeQuery?.skip) {
@@ -45,18 +45,18 @@ async function recipeGet(req, res) {
         return res.status(400).json({ errors: errs });
     }
 
-    const recipes = await Recipe.findAll(recipeQuery);
+    const recipes = await RecipeModel.findAll(recipeQuery);
     return res.json({ recipes });
 }
 
 async function recipeGetIndividual(req, res) {
-    const recipe = await Recipe.getRecipe(req.params.id);
+    const recipe = await RecipeModel.getRecipe(req.params.id);
     return res.json({ recipe });
 }
 
 async function recipeUploadPhoto(req, res) {
     const image = req.file || '';
-    const urlResponse = await uploadRecipeImage(image);
+    const urlResponse = await uploadImageToS3(image);
 
     if (image) await unlinkFile(image.path);
 
@@ -64,19 +64,19 @@ async function recipeUploadPhoto(req, res) {
 }
 
 async function recipeUpdate(req, res) {
-    const recipe = await Recipe.handleUpdates(req.params.id, req.body);
+    const recipe = await RecipeModel.handleUpdates(req.params.id, req.body);
     return res.json({ recipe });
 }
 
 async function recipeDelete(req, res) {
-    await Recipe.removeRecipe(req.params.id);
+    await RecipeModel.removeRecipe(req.params.id);
     return res.json({ deleted: req.params.id });
 }
 
 
 module.exports = {
     recipeCreate,
-    recipeGet,
+    recipeGetAll,
     recipeGetIndividual,
     recipeUploadPhoto,
     recipeUpdate,

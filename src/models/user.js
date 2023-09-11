@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require("../config/db.js");
+const db = require("../configs/db.js");
 const bcrypt = require("bcrypt");
 const { sqlForPartialUpdate } = require("../utils/sql");
 
@@ -8,9 +8,9 @@ const {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
-} = require("../error/expressError");
+} = require("../utils/expressError");
 
-const { BCRYPT_WORK_FACTOR } = require("../config/config.js");
+const { BCRYPT_WORK_FACTOR } = require("../configs/general");
 
 /** Related functions for users. */
 

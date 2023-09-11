@@ -1,8 +1,8 @@
 "use strict";
 
-const db = require("../../config/db.js");
-const { BadRequestError, NotFoundError } = require("../../error/expressError");
-const Recipe = require("../recipe.js");
+const db = require("../../configs/db.js");
+const { BadRequestError, NotFoundError } = require("../../utils/expressError");
+const RecipeModel = require("../RecipeModel.js");
 
 const {
     commonBeforeAll,
@@ -31,7 +31,7 @@ describe("create recipes", function() {
     };
 
     test("create a recipe", async function() {
-        let recipe = await Recipe.insertRecipe(newRecipe); 
+        let recipe = await RecipeModel.insertRecipe(newRecipe); 
         expect(recipe).toEqual({ id: expect.any(Number) });
 
         const recipeResponse = await db.query(            
@@ -50,7 +50,7 @@ describe("create recipes", function() {
 
 
     test("create ingredient", async function() {
-        let ingredient = await Recipe.insertIngredients('test_food');
+        let ingredient = await RecipeModel.insertIngredients('test_food');
         expect(ingredient).toEqual(
             { 
                 id: expect.any(Number),
@@ -59,7 +59,7 @@ describe("create recipes", function() {
     });
 
     test("return an existing ingredient", async function() {
-        let ingredient = await Recipe.insertIngredients('ingredient_1');
+        let ingredient = await RecipeModel.insertIngredients('ingredient_1');
         expect(ingredient).toEqual(
             {
                 id: ingredientIds[0],
@@ -70,7 +70,7 @@ describe("create recipes", function() {
 
     test("handle non string ingredient value", async function() {
         try {
-            await Recipe.insertIngredients(0);
+            await RecipeModel.insertIngredients(0);
             fail();
         } catch(err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -79,7 +79,7 @@ describe("create recipes", function() {
     });
 
     test("create measurement", async function() {
-        let measurement = await Recipe.insertMeasurements('test_measurement');
+        let measurement = await RecipeModel.insertMeasurements('test_measurement');
         expect(measurement).toEqual(
             {
                 id: expect.any(Number),
@@ -89,12 +89,12 @@ describe("create recipes", function() {
     });
 
     test("handles empty measurments", async function() {
-        let measurement = await Recipe.insertMeasurements('');
+        let measurement = await RecipeModel.insertMeasurements('');
         expect(measurement).toEqual(undefined);
     });
 
     test("create recipe ingredients", async function() {
-        let recipeIngredient = await Recipe.insertRecipeIngredients(
+        let recipeIngredient = await RecipeModel.insertRecipeIngredients(
             {
                 recipeId: recipeIds[1],
                 measurementId: measurementIds[1],
@@ -113,7 +113,7 @@ describe("create recipes", function() {
     });
 
     test("create recipe ingredient with empty measurement", async function() {
-        let recipeIngredient = await Recipe.insertRecipeIngredients(
+        let recipeIngredient = await RecipeModel.insertRecipeIngredients(
             {
                 recipeId: recipeIds[3],
                 measurementId: '',
@@ -141,7 +141,7 @@ describe("_ingredientBuilder", function() {
             amount: '10',
         }
 
-        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[2]);
+        const recipe = await RecipeModel._ingredientBuilder(recipeList, recipeIds[2]);
         expect(recipe).toEqual(
             {
                 recipeId: expect.any(Number),
@@ -159,7 +159,7 @@ describe("_ingredientBuilder", function() {
             amount: '3'
         }
 
-        const recipe = await Recipe._ingredientBuilder(recipeList, recipeIds[0]);
+        const recipe = await RecipeModel._ingredientBuilder(recipeList, recipeIds[0]);
         expect(recipe).toEqual(
             {
                 recipeId: expect.any(Number),
@@ -178,7 +178,7 @@ describe("_ingredientBuilder", function() {
         }
 
         try {
-            await Recipe._ingredientBuilder(recipeList, null);
+            await RecipeModel._ingredientBuilder(recipeList, null);
             fail();
         } catch (err) {
             expect(err instanceof BadRequestError).toBeTruthy();
@@ -191,7 +191,7 @@ describe("_ingredientBuilder", function() {
 describe("findAll", function() {
     test("works: all recipes", async function() {
 
-        let recipes = await Recipe.findAll();
+        let recipes = await RecipeModel.findAll();
         expect(recipes).toEqual([
             { 
                 id: recipeIds[0],
@@ -229,7 +229,7 @@ describe("findAll", function() {
     }); 
 
     test("works: find cooking time", async function() {
-        const recipes = await Recipe.findAll({ cookingTime: 20});
+        const recipes = await RecipeModel.findAll({ cookingTime: 20});
         expect(recipes).toEqual([
             { 
                 id: recipeIds[0],
@@ -251,7 +251,7 @@ describe("findAll", function() {
     });
 
     test("works: find recipe type", async function() {
-        const recipes = await Recipe.findAll({ recipeName: "vegan"});
+        const recipes = await RecipeModel.findAll({ recipeName: "vegan"});
         expect(recipes).toEqual([
             { 
                 id: recipeIds[0],
@@ -273,7 +273,7 @@ describe("findAll", function() {
     });
 
     test("works: find recipe name", async function() {
-        const recipes = await Recipe.findAll({ recipeName: "1"});
+        const recipes = await RecipeModel.findAll({ recipeName: "1"});
         expect(recipes).toEqual([
             { 
                 id: recipeIds[0],
@@ -287,7 +287,7 @@ describe("findAll", function() {
     });
 
     test("works find cooking time", async function() {
-        const recipes = await Recipe.findAll({ cookingTime: 20 });
+        const recipes = await RecipeModel.findAll({ cookingTime: 20 });
         expect(recipes).toEqual([
             {
                 id: recipeIds[0],
@@ -309,7 +309,7 @@ describe("findAll", function() {
     });
 
     test("handles not found values", async function() {
-        const recipes = await Recipe.findAll({ recipeName: 1000000 });
+        const recipes = await RecipeModel.findAll({ recipeName: 1000000 });
         expect(recipes).toEqual([]);
     })
 
@@ -317,7 +317,7 @@ describe("findAll", function() {
 /******************************* getRecipe ************************************/
 describe("get recipe", function() {
     test('finds a recipe', async function() {
-        const recipe = await Recipe.getRecipe(recipeIds[0]);
+        const recipe = await RecipeModel.getRecipe(recipeIds[0]);
         expect(recipe).toEqual(
             {
                 id: recipeIds[0],
@@ -342,7 +342,7 @@ describe("get recipe", function() {
 
     test('not found if no such recipe', async function() {
         try {
-            await Recipe.getRecipe(9999);
+            await RecipeModel.getRecipe(9999);
             fail();
         } catch (err) {
             expect(err instanceof NotFoundError).toBeTruthy();
@@ -362,14 +362,14 @@ describe("update a curent recipe", function() {
     };
 
     test("update recipe", async function() {
-        const updateRecipe = await Recipe.updateRecipe(recipeIds[0], updateData);
+        const updateRecipe = await RecipeModel.updateRecipe(recipeIds[0], updateData);
         expect(updateRecipe).toEqual({
             id: recipeIds[0],
             recipeName: "update_recipe"
         });
 
         //Testing recipe updated properly
-        const recipe = await Recipe.getRecipe(recipeIds[0]);
+        const recipe = await RecipeModel.getRecipe(recipeIds[0]);
         expect(recipe).toEqual([
             {
                 id: recipeIds[0],
@@ -394,7 +394,7 @@ describe("update a curent recipe", function() {
 
     test('not found if no such recipe', async function() {
         try {
-            await Recipe.updateRecipe(9999, updateData);
+            await RecipeModel.updateRecipe(9999, updateData);
             fail();
         } catch (err) {
             expect(err instanceof NotFoundError).toBeTruthy();
@@ -405,7 +405,7 @@ describe("update a curent recipe", function() {
 /******************************* deleteRecipe *********************************/
 describe("remove a recipe", function() {
     test("remove recipe", async function() {
-        await Recipe.removeRecipe(recipeIds[1]);
+        await RecipeModel.removeRecipe(recipeIds[1]);
 
         //Check if Deleted
         const recipe = await db.query(`SELECT id FROM recipes WHERE id=${recipeIds[1]}`);
@@ -414,7 +414,7 @@ describe("remove a recipe", function() {
 
     test('not found if no such recipe', async function() {
         try {
-            await Recipe.removeRecipe(9999);
+            await RecipeModel.removeRecipe(9999);
             fail();
         } catch (err) {
             expect(err instanceof NotFoundError).toBeTruthy();
@@ -433,7 +433,7 @@ describe("remove a recipe ingredient list", function() {
             measurementId: measurementIds[0]
         };
 
-        await Recipe.removeRecipeIngredients(recipeData);
+        await RecipeModel.removeRecipeIngredients(recipeData);
 
         //Check if Deleted
         const recipeList = await db.query(
@@ -454,7 +454,7 @@ describe("remove a recipe ingredient list", function() {
             ingredientId: ingredientIds[2]
         };
 
-        await Recipe.removeRecipeIngredients(recipeData);
+        await RecipeModel.removeRecipeIngredients(recipeData);
 
         //Check if Deleted
         const recipeList = await db.query(
@@ -475,7 +475,7 @@ describe("remove a recipe ingredient list", function() {
         };
 
         try {
-            await Recipe.removeRecipeIngredients(invalidData);
+            await RecipeModel.removeRecipeIngredients(invalidData);
             fail();
         } catch (err) {
             expect(err instanceof NotFoundError).toBeTruthy();

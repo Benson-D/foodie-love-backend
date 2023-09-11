@@ -6,7 +6,7 @@ const { sqlForPartialUpdate } = require("../utils/sql");
 
 /** Related functions for recipes. */
 
-class Recipe {
+class RecipeModel {
     /** Create a recipe, updates db, return new recipe data.
      * 
      * data should be { recipeName, prepTime, cookingTime, recipeImage, 
@@ -545,4 +545,4 @@ class Recipe {
 
 }
 
-module.exports = Recipe; 
+module.exports = RecipeModel; 

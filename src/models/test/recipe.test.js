@@ -370,26 +370,24 @@ describe("update a curent recipe", function() {
 
         //Testing recipe updated properly
         const recipe = await RecipeModel.getRecipe(recipeIds[0]);
-        expect(recipe).toEqual([
-            {
-                id: recipeIds[0],
-                recipeName: "update_recipe",
-                prepTime: '1 minute',
-                cookingTime: '10 minutes', 
-                recipeImage: null,
-                mealType: "italian",
-                instructions: "adding test, update current recipe",
-                ingredients: [
-                    {
-                        amount: '5', 
-                        measurementId: measurementIds[0],
-                        measurement: 'measurement_cup',
-                        ingredientId: ingredientIds[0],
-                        ingredient: 'ingredient_1'
-                    }
-                ] 
-            },
-        ]);
+        expect(recipe).toEqual({
+            id: recipeIds[0],
+            recipeName: "update_recipe",
+            prepTime: '1 minute',
+            cookingTime: '10 minutes', 
+            recipeImage: null,
+            mealType: "italian",
+            instructions: "adding test, update current recipe",
+            ingredients: [
+                {
+                    amount: '5', 
+                    measurementId: measurementIds[0],
+                    measurement: 'measurement_cup',
+                    ingredientId: ingredientIds[0],
+                    ingredient: 'ingredient_1'
+                }
+            ] 
+        });
     })
 
     test('not found if no such recipe', async function() {

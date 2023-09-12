@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 
-const db = require("../../config/db.js");
-const { BCRYPT_WORK_FACTOR } = require("../../config/config");
+const db = require("../../configs/db.js");
+const { BCRYPT_WORK_FACTOR } = require("../../configs/general");
 
 const recipeIds = [];
 const ingredientIds = [];

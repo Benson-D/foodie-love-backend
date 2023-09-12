@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { SECRET_KEY } = require("../config/config");
+const { SECRET_KEY } = require("../configs/general");
 
 /** return signed JWT from user data. */
 function createToken(user) {

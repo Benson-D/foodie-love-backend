@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../../configs/db.js");
-const { BadRequestError, NotFoundError } = require("../../utils/expressError");
+const { BadRequestError, NotFoundError } = require("../../utils/expressError.js");
 const RecipeModel = require("../RecipeModel.js");
 
 const {
@@ -12,7 +12,7 @@ const {
     recipeIds,
     ingredientIds,
     measurementIds
-  } = require("./_testCommon");
+  } = require("./_testCommon.js");
   
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);

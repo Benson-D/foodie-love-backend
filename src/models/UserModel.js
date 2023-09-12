@@ -2,19 +2,19 @@
 
 const db = require("../configs/db.js");
 const bcrypt = require("bcrypt");
-const { sqlForPartialUpdate } = require("../utils/sql");
+const { sqlForPartialUpdate } = require("../utils/sql.js");
 
 const {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
-} = require("../utils/expressError");
+} = require("../utils/expressError.js");
 
-const { BCRYPT_WORK_FACTOR } = require("../configs/general");
+const { BCRYPT_WORK_FACTOR } = require("../configs/general.js");
 
 /** Related functions for users. */
 
-class User {
+class UserModel {
 
   /**
    * Authenticate user with username, password.
@@ -214,7 +214,7 @@ class User {
   }
 
   /**
-   * User adds a recipe to their list of favorites, makes a db relationship
+   * UserModel adds a recipe to their list of favorites, makes a db relationship
    * @param {string} username 
    * @param {Number} recipeId 
    */
@@ -244,7 +244,7 @@ class User {
   }
 
   /**
-   * User adds a grocery ingredient list, makes a db relationship
+   * UserModel adds a grocery ingredient list, makes a db relationship
    * @param {string} username 
    * @param {Number} ingredientId 
    */
@@ -274,4 +274,4 @@ class User {
   }
 }
 
-module.exports = User;
+module.exports = UserModel;

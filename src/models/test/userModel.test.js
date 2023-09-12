@@ -7,7 +7,7 @@ const {
 } = require("../../utils/expressError");
 
 const db = require("../../configs/db.js");
-const User = require("../user.js");
+const UserModel = require("../UserModel.js");
 
 const {
   commonBeforeAll,
@@ -26,7 +26,7 @@ afterAll(commonAfterAll);
 /******************************* authenticate *********************************/
 describe("authenticate", function () {
     test("works", async function () {
-      const user = await User.authenticate("u1", "password1");
+      const user = await UserModel.authenticate("u1", "password1");
       expect(user).toEqual({
         username: "u1",
         firstName: "U1F",
@@ -38,7 +38,7 @@ describe("authenticate", function () {
   
     test("unauth if no such user", async function () {
       try {
-        await User.authenticate("nope", "password");
+        await UserModel.authenticate("nope", "password");
         fail();
       } catch (err) {
         expect(err instanceof UnauthorizedError).toBeTruthy();
@@ -47,7 +47,7 @@ describe("authenticate", function () {
   
     test("unauth if wrong password", async function () {
       try {
-        await User.authenticate("c1", "wrong");
+        await UserModel.authenticate("c1", "wrong");
         fail();
       } catch (err) {
         expect(err instanceof UnauthorizedError).toBeTruthy();
@@ -66,7 +66,7 @@ describe("register user", function () {
     };
 
     test("works", async function () {
-        let user = await User.register({
+        let user = await UserModel.register({
         ...newUser,
         password: "password",
         });
@@ -78,7 +78,7 @@ describe("register user", function () {
     });
 
     test("works: adds admin", async function () {
-        let user = await User.register({
+        let user = await UserModel.register({
         ...newUser,
         password: "password",
         isAdmin: true,
@@ -92,11 +92,11 @@ describe("register user", function () {
 
     test("bad request with dup data", async function () {
         try {
-        await User.register({
+        await UserModel.register({
             ...newUser,
             password: "password",
         });
-        await User.register({
+        await UserModel.register({
             ...newUser,
             password: "password",
         });
@@ -110,7 +110,7 @@ describe("register user", function () {
 /************************************** findAll *******************************/
 describe("findAll users", function () {
     test("works", async function () {
-        const users = await User.findAll();
+        const users = await UserModel.findAll();
         expect(users).toEqual([
         {
             username: "u1",
@@ -133,7 +133,7 @@ describe("findAll users", function () {
 /************************************** get ***********************************/
 describe("get", function () {
     test("works", async function () {
-        let user = await User.get("u1");
+        let user = await UserModel.get("u1");
         expect(user).toEqual({
         username: "u1",
         firstName: "U1F",
@@ -147,7 +147,7 @@ describe("get", function () {
 
     test("not found if no such user", async function () {
         try {
-        await User.get("nope");
+        await UserModel.get("nope");
         fail();
         } catch (err) {
         expect(err instanceof NotFoundError).toBeTruthy();
@@ -165,7 +165,7 @@ describe("update", function () {
     };
   
     test("works", async function () {
-      let job = await User.update("u1", updateData);
+      let job = await UserModel.update("u1", updateData);
       expect(job).toEqual({
         username: "u1",
         ...updateData,
@@ -173,7 +173,7 @@ describe("update", function () {
     });
   
     test("works: set password", async function () {
-      let job = await User.update("u1", {
+      let job = await UserModel.update("u1", {
         password: "new",
       });
       expect(job).toEqual({
@@ -190,7 +190,7 @@ describe("update", function () {
   
     test("not found if no such user", async function () {
       try {
-        await User.update("nope", {
+        await UserModel.update("nope", {
           firstName: "test",
         });
         fail();
@@ -202,7 +202,7 @@ describe("update", function () {
     test("bad request if no data", async function () {
       expect.assertions(1);
       try {
-        await User.update("c1", {});
+        await UserModel.update("c1", {});
         fail();
       } catch (err) {
         expect(err instanceof BadRequestError).toBeTruthy();
@@ -213,7 +213,7 @@ describe("update", function () {
 /************************************** remove ********************************/
 describe("remove", function () {
     test("works", async function () {
-        await User.remove("u1");
+        await UserModel.remove("u1");
         const res = await db.query(
             "SELECT * FROM users WHERE username='u1'");
         expect(res.rows.length).toEqual(0);
@@ -221,7 +221,7 @@ describe("remove", function () {
 
     test("not found if no such user", async function () {
         try {
-        await User.remove("nope");
+        await UserModel.remove("nope");
         fail();
         } catch (err) {
         expect(err instanceof NotFoundError).toBeTruthy();

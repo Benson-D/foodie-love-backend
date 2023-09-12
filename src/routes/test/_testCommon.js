@@ -2,7 +2,7 @@
 
 const db = require("../../configs/db.js");
 const RecipeModel = require("../../models/RecipeModel.js");
-const User = require("../../models/user.js");
+const User = require("../../models/UserModel.js");
 const { createToken } = require("../../utils/token");
 
 async function commonBeforeAll() {

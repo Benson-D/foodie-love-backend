@@ -23,7 +23,7 @@ async function recipeCreate(req, res, next) {
     const recipeIngregients = JSON.parse(ingredientList);
 
     recipe.ingredients = await Promise.all(recipeIngregients.map( 
-        async (list) => await RecipeModel._ingredientBuilder(list, recipe.id)));
+        async (list) => await _ingredientBuilder(list, recipe.id)));
     
     return res.status(201).json({ recipe });
 }
@@ -76,6 +76,8 @@ async function recipeDelete(req, res) {
     return res.json({ deleted: req.params.id });
 }
 
+/******************************* Helpers **************************************/
+
 async function _ingredientBuilder(recipeItems, recipeId){
     if (typeof recipeId !== 'number') {
         throw new BadRequestError('Not a valid id');
@@ -116,7 +118,6 @@ async function insertMeasurement(measurement) {
     const response = await RecipeModel.insertMeasurements(measurement);
     return response?.id ?? '';
 }
-
 
 
 module.exports = {

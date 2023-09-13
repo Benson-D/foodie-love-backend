@@ -4,17 +4,16 @@ const db = require("../configs/db");
 const { BadRequestError, NotFoundError } = require("../utils/expressError");
 const { sqlForPartialUpdate } = require("../utils/sql");
 
-/** Related functions for recipes. */
-
 class RecipeModel {
-    /** Create a recipe, updates db, return new recipe data.
+    /** 
+     * Creates a recipe and returns data created.
      * 
-     * data should be { recipeName, prepTime, cookingTime, recipeImage, 
+     * recipeData = { recipeName, prepTime, cookingTime, recipeImage, 
      * instructions, mealType }
      * 
      * 
      * @param {Object} recipeData 
-     * @return {Promise<string>} JSON [{ id }]
+     * @return {Promise<string>} JSON { id }
      */
     static async insertRecipe(recipeData) {
         const { recipeName, prepTime, cookingTime, recipeImage, 
@@ -40,14 +39,14 @@ class RecipeModel {
         return recipe; 
     }
 
-    /** Create a ingredient, updates db, return new ingredient data.
+    /** 
+     * Creates an ingredient and returns new ingredient data.
+     * If data already in database returns ingredient.
      * 
-     * data should be { ingredientName } 
-     * 
-     * If ingredient already in database returns that ingredient data
+     * ingredientName =  ingredientName: string
      * 
      * @param {string} ingredientName
-     * @return {Promise<string>} JSON [{ id, ingredientName }]
+     * @return {Promise<string>} JSON { id, ingredientName }
      */
     static async insertIngredients(ingredientName) {
         if (typeof ingredientName !== 'string') {
@@ -75,14 +74,14 @@ class RecipeModel {
         return ingredient;
     }
 
-    /** Create a measurement, updates db, return new measurement data.
+    /** 
+     * Creates a measurement and returns new measurement data.
+     * If data already in database returns that measurement.
      * 
-     * data should be { measurementDescription }
-     * 
-     * If measurement already in database returns that measurement data
+     * measurementDescription =  measurementDescription: string
      * 
      * @param {string} measurementDescription
-     * @return {Promise<string>} JSON [{ id, measurementDescription }]
+     * @return {Promise<string>} JSON { id, measurementDescription }
      */
     static async insertMeasurements(measurementDescription) {
         if(!measurementDescription) return;
@@ -153,14 +152,18 @@ class RecipeModel {
 
     }
 
-    /** Create a recipe ingredient, updates db, 
-     * return new recipe ingredient data.
+    /** 
+     * Create a recipe ingredient and returns new recipe ingredient data.
      * 
-     * data should be { recipeId, measurementId, ingredientId, amount }
+     * recipeData = { 
+     *  recipeId: integer, 
+     *  measurementId: integer | undefined, 
+     *  ingredientId: integer, 
+     *  amount: integer }
      * 
      * @param {Object} recipeData
      * @return {Promise<string>} JSON
-     *  [{ recipeId, measurementId, ingredientId, amount }]
+     *  { recipeId, measurementId, ingredientId, amount }
      */
     static async insertRecipeIngredients(recipeData) {
         const { recipeId, measurementId, ingredientId, amount } = recipeData;

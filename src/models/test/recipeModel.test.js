@@ -2,7 +2,7 @@
 
 const db = require("../../configs/db.js");
 const { BadRequestError, NotFoundError } = require("../../utils/expressError.js");
-const RecipeModel = require("../RecipeModel.js");
+const RecipeModel = require("../recipeModel.js");
 
 const {
     commonBeforeAll,

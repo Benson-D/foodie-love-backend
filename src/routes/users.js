@@ -5,7 +5,7 @@ const jsonschema = require("jsonschema");
 const express = require("express");
 
 const { BadRequestError } = require("../error/expressError");
-const UserModel = require("../models/UserModel");
+const UserModel = require("../models/userModel");
 const { createToken } = require("../utils/tokens");
 const { router } = require("../app");
 

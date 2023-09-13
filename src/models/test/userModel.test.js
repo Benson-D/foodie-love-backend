@@ -7,7 +7,7 @@ const {
 } = require("../../utils/expressError");
 
 const db = require("../../configs/db.js");
-const UserModel = require("../UserModel.js");
+const UserModel = require("../userModel");
 
 const {
   commonBeforeAll,

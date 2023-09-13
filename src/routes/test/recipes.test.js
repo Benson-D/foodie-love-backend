@@ -52,7 +52,6 @@ describe("POST /recipes ", function() {
     };
 
     test("bad request with invalid data", async function() {
-        
         const response = await request(app)
             .post("/recipes")
             .send({

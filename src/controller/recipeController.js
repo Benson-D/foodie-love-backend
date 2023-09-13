@@ -1,9 +1,12 @@
 const jsonschema = require("jsonschema");
 const { uploadImageToS3 } = require("../aws/s3");
-const RecipeModel = require("../models/RecipeModel.js");
+const RecipeModel = require("../models/recipeModel.js");
 
 const recipeNewSchema = require("../schemas/recipeNew.json");
 const recipeSearchSchema = require("../schemas/recipeSearch.json");
+
+const { BadRequestError } = require("../utils/expressError");
+
 
 async function recipeCreate(req, res, next) {
     const validator = jsonschema.validate(req.body, recipeNewSchema);
@@ -72,6 +75,48 @@ async function recipeDelete(req, res) {
     await RecipeModel.removeRecipe(req.params.id);
     return res.json({ deleted: req.params.id });
 }
+
+async function _ingredientBuilder(recipeItems, recipeId){
+    if (typeof recipeId !== 'number') {
+        throw new BadRequestError('Not a valid id');
+    }
+    
+    const { amount, measurement, ingredient } = recipeItems;
+    
+    const measurementId = await insertMeasurement(measurement);
+    const ingredientId = await insertIngredient(ingredient);
+    const parsedAmount = parseRecipeAmount(amount);
+    
+    const recipeData = { 
+        recipeId: recipeId, 
+        measurementId: measurementId,
+        ingredientId: ingredientId, 
+        amount: parsedAmount
+    };
+    
+    const result = await RecipeModel.insertRecipeIngredients(recipeData);
+    return result;
+}
+
+function parseRecipeAmount(amount) {
+    if (amount.includes('/')) {
+        amount = amount.split('/')
+                       .reduce((total, amount) => Number(total) / Number(amount));
+    }
+
+    return parseFloat(parsedAmount);
+}
+
+async function insertIngredient(ingredient) {
+    const response = await RecipeModel.insertIngredients(ingredient);
+    return response.id;
+}
+
+async function insertMeasurement(measurement) {
+    const response = await RecipeModel.insertMeasurements(measurement);
+    return response?.id ?? '';
+}
+
 
 
 module.exports = {

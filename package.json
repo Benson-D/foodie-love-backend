@@ -2,9 +2,10 @@
   "name": "foodie-love",
   "version": "1.0.0",
   "description": "recipe resource, grocery list",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node src/server.ts",
+    "build": "tsc",
     "dev": "ts-node-dev src/server.ts",
     "test": "jest -i"
   },

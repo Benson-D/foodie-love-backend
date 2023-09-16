@@ -1,6 +1,6 @@
-const request = require("supertest");
-const app = require("../app");
-const db = require("../configs/db.js");
+import request from "supertest";
+import app from "../app";
+import db from "../configs/db";
 
 describe("test connection of app", function() {
     test("not found site 404", async function() {
@@ -11,5 +11,4 @@ describe("test connection of app", function() {
 
 afterAll(function () {
     db.end();
-  });
-  
+});

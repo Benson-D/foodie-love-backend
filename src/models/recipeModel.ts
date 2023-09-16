@@ -1,4 +1,4 @@
-import { db } from "../configs/db";
+import db from "../configs/db";
 import { BadRequestError, NotFoundError } from "../utils/expressError";
 import { sqlForPartialUpdate } from "../utils/sql";
 

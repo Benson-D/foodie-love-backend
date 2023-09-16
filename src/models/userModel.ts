@@ -176,10 +176,10 @@ class UserModel {
    */
 
     static async update(username: string, data: {    
-      username: string;
+      username?: string;
       password?: string;
-      firstName: string;
-      lastName: string;
+      firstName?: string;
+      lastName?: string;
       email?: string;
     }) {
       if (data.password) {

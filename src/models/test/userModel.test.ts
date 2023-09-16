@@ -1,23 +1,18 @@
 "use strict";
 
-const {
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
-} = require("../../utils/expressError");
+import db from "../../configs/db";
+import { BadRequestError, NotFoundError, UnauthorizedError } from "../../utils/expressError";
+import UserModel from "../userModel";
 
-const db = require("../../configs/db.js");
-const UserModel = require("../userModel");
-
-const {
-  commonBeforeAll,
-  commonBeforeEach,
-  commonAfterEach,
-  commonAfterAll,
-  recipeIds,
-  ingredientIds
-} = require("./_testCommon");
-
+import {
+    commonBeforeAll,
+    commonBeforeEach,
+    commonAfterEach,
+    commonAfterAll,
+    recipeIds,
+    ingredientIds
+  } from "./_testCommon";
+  
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
 afterEach(commonAfterEach);

@@ -1,11 +1,10 @@
-const bcrypt = require("bcrypt");
+import bcrypt from "bcrypt";
+import db from "../../configs/db";
+import { BCRYPT_WORK_FACTOR } from "../../configs/general";
 
-const db = require("../../configs/db.js");
-const { BCRYPT_WORK_FACTOR } = require("../../configs/general");
-
-const recipeIds = [];
-const ingredientIds = [];
-const measurementIds = [];
+const recipeIds: number[] = [];
+const ingredientIds: number[] = [];
+const measurementIds: number[] = [];
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -96,7 +95,7 @@ async function commonAfterAll() {
 }
 
 
-module.exports = {
+export {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,

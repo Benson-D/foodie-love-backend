@@ -1,6 +1,9 @@
 # compiled output
 /dist
 node_modules/
+src/**/*.d.ts 
+src/**/*.js
+src/**/*.map
 
 # private
 .env

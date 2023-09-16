@@ -1,15 +1,10 @@
-"use strict"; 
+import UserModel from "../models/userModel";
+import { createToken } from "../utils/token";
+import  { Router } from "express";
 
-/** Routes for users. */
-const jsonschema = require("jsonschema");
-const express = require("express");
+const router: Router = Router();
 
-const { BadRequestError } = require("../error/expressError");
-const UserModel = require("../models/userModel");
-const { createToken } = require("../utils/tokens");
-const { router } = require("../app");
-
-router.post("/", async function (req, res, next) {
+router.post("/", async function (req, res) {
    const user = await UserModel.register(req.body);
    const token = createToken(user); 
 

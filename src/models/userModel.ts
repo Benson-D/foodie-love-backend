@@ -1,18 +1,8 @@
-"use strict";
-
-const db = require("../configs/db.js");
-const bcrypt = require("bcrypt");
-const { sqlForPartialUpdate } = require("../utils/sql.js");
-
-const {
-  NotFoundError,
-  BadRequestError,
-  UnauthorizedError,
-} = require("../utils/expressError.js");
-
-const { BCRYPT_WORK_FACTOR } = require("../configs/general.js");
-
-/** Related functions for users. */
+import bcrypt from "bcrypt";
+import db from "../configs/db";
+import { BCRYPT_WORK_FACTOR } from "../configs/general";
+import { sqlForPartialUpdate } from "../utils/sql";
+import { NotFoundError, BadRequestError, UnauthorizedError } from "../utils/expressError";
 
 class UserModel {
 
@@ -27,7 +17,13 @@ class UserModel {
    * @returns {Promise<string>} JSON  
    * [{ username, first_name, last_name, email, is_admin }]
    */
-   static async authenticate(username, password) {
+   public static async authenticate(username: string, password: string): Promise<{
+    username: string;
+    firstName: string;
+    lastName: string;
+    email: string | undefined;
+    isAdmin: boolean
+   }> {
         
         const result = await db.query(
             `SELECT username,
@@ -62,7 +58,18 @@ class UserModel {
     * @param {*} userData 
     * @return {Promise<string>} [{ username, firstName, lastName, email, isAdmin }]
     */
-   static async register( userData ) {
+   static async register( userData: {    
+    username: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    email: string | undefined;
+    isAdmin: boolean} ): Promise<{ 
+      username: string;
+      firstName: string;
+      lastName: string;
+      email: string | undefined;
+    }> {
    
     const { username, password, firstName, lastName, email, isAdmin } = userData;
    
@@ -97,7 +104,12 @@ class UserModel {
    * 
    * @returns {Promise<string>} JSON  
    */
-  static async findAll() {
+  static async findAll(): Promise<{    
+    username: string;
+    firstName: string;
+    name: string;
+    email: string;
+    isAdmin: boolean; }[]> {
     const users = await db.query(
           `SELECT username,
                   first_name AS "firstName",
@@ -116,7 +128,7 @@ class UserModel {
    * @returns {Promise<string>} JSON 
    * [{ username, first_name, last_name, email, is_admin }]
    */
-  static async get(username) {
+  static async get(username: string) {
     const userRes = await db.query(
         `SELECT username,
                 first_name AS "firstName",
@@ -140,8 +152,8 @@ class UserModel {
            FROM users_groceries 
            WHERE username = $1`,[username]);
 
-    user.recipes = userRecipes.rows.map(u => u.recipe_id); 
-    user.groceries = userIngredienets.rows.map(u => u.ingredient_id); 
+    user.recipes = userRecipes.rows.map((u: { recipe_id: number; }) => u.recipe_id); 
+    user.groceries = userIngredienets.rows.map((u: { ingredient_id: number; }) => u.ingredient_id); 
 
     return user; 
   }
@@ -163,7 +175,13 @@ class UserModel {
    * or a serious security risks are opened.
    */
 
-    static async update(username, data) {
+    static async update(username: string, data: {    
+      username: string;
+      password?: string;
+      firstName: string;
+      lastName: string;
+      email?: string;
+    }) {
       if (data.password) {
         data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
       };
@@ -199,7 +217,7 @@ class UserModel {
    * Delete given user from database; returns undefined.
    * @param {string} username 
    */
-  static async remove(username) {
+  static async remove(username: string): Promise<void> {
     let result = await db.query(
         `DELETE
         FROM users
@@ -218,7 +236,7 @@ class UserModel {
    * @param {string} username 
    * @param {Number} recipeId 
    */
-  static async addRecipe(username, recipeId) {
+  static async addRecipe(username: string, recipeId: number) {
     const checkRecipe = await db.query(
       `SELECT id
        FROM recipes
@@ -248,7 +266,7 @@ class UserModel {
    * @param {string} username 
    * @param {Number} ingredientId 
    */
-  static async addGrocery(username, ingredientId) {
+  static async addGrocery(username: string, ingredientId: number) {
     const checkIngredient = await db.query(
       `SELECT id
        FROM ingredients

@@ -54,20 +54,20 @@ async function createRecipe(req: Request, res: Response) {
     const recipe = await RecipeModel.insertRecipe(req.body);
     
     const { ingredientList } = req.body; 
-    const recipeIngregients = JSON.parse(ingredientList);
+    const recipeIngredients = JSON.parse(ingredientList);
 
-    const responseIngredients = await Promise.all(recipeIngregients.map( 
+    const responseIngredients = await Promise.all(recipeIngredients.map( 
         async (list: {  
-          amount: string;
-          measurement: string;
-          ingredient: string;}) => await _ingredientBuilder(recipe.id, list)));
-
+            amount: string;
+            measurement: string;
+            ingredient: string;}) => await _ingredientBuilder(recipe.id, list)));
+            
      const output = {
         id: recipe.id,
-        ...responseIngredients
+        ingredients: [...responseIngredients]
      }   
     
-    return res.status(201).json({ output });
+    return res.status(201).json({ recipe: output });
 }
 
 /**
@@ -231,13 +231,13 @@ async function _ingredientBuilder(
 }
 
 function parseRecipeAmount(amount: string): number {
-    let parsedAmount = '';
+    let parsedAmount = amount;
 
     if (amount.includes('/')) {
         parsedAmount = amount.split('/')
                        .map(Number)
                        .reduce((total, amount) => total / amount).toString();
-    }
+    } 
 
     return parseFloat(parsedAmount);
 }

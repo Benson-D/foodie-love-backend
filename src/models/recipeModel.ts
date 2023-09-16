@@ -1,5 +1,5 @@
 import db from "../configs/db";
-import { BadRequestError, NotFoundError } from "../utils/expressError";
+import { NotFoundError } from "../utils/expressError";
 import { sqlForPartialUpdate } from "../utils/sql";
 
 interface GetRecipe {
@@ -73,10 +73,6 @@ class RecipeModel {
 	public static async insertIngredients(
 		ingredientName: string
 	): Promise<{ id: number; ingredientName: string }> {
-		if (typeof ingredientName !== 'string') {
-		throw new BadRequestError('Not a valid ingredient');
-		}
-
 		const checkIngredient = await db.query(
 		`SELECT id,
 				ingredient_name AS "ingredientName"
@@ -103,9 +99,7 @@ class RecipeModel {
 
     /**
 	 * Creates a measurement and returns new measurement data.
-	 *  If data already in database returns that measurement.
-     * 
-     * measurementDescription =  measurementDescription: string
+	 * If data already in database returns that measurement.
      * 
 	 * @param {string | null} measurementDescription
 	 * @return {Promise<{ id: number, measurementDescription: string } | undefined>} 
@@ -113,12 +107,12 @@ class RecipeModel {
 	 */
   	public static async insertMeasurements(
 		measurementDescription: string | null
-	  ): Promise<{ id: number; measurementDescription: string } | undefined> {
+	  ): Promise<{ id: number; measurement: string } | undefined> {
 		if (!measurementDescription) return;
 	
 		const checkMeasurement = await db.query(
 		  `SELECT id,
-						measurement_description AS "measurementDescription"
+						measurement_description AS "measurement"
 				FROM measurement_units
 				WHERE measurement_description = $1`,
 		  [measurementDescription]
@@ -131,7 +125,7 @@ class RecipeModel {
 		const result = await db.query(
 		  `INSERT INTO measurement_units (measurement_description)
 				 VALUES ($1)
-				 RETURNING id, measurement_description AS "measurementDescription"`,
+				 RETURNING id, measurement_description AS "measurement"`,
 		  [measurementDescription]
 		);
 	
@@ -338,8 +332,8 @@ class RecipeModel {
      */
     public static async updateRecipe(id: number, data: {
         recipeName: string;
-        prepTime: string;
-        cookingTime: string;
+        prepTime?: number;
+        cookingTime?: number;
         recipeImage: string;
         mealType: string;
         instructions: string;
@@ -449,11 +443,9 @@ class RecipeModel {
      * @param {Object} data 
      */
      public static async removeRecipeIngredients(data : {    
-        amount: number;
+        recipeId: number;
         measurementId?: number;
-        measurement?: string;
-        ingredientId?: number;
-        ingredient: string;}): Promise<void> {
+        ingredientId: number;}): Promise<void> {
 
         const columnsToSql = {
             recipeId: "recipe_id",

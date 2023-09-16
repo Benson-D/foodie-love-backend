@@ -111,7 +111,7 @@ async function getIndividualRecipe(req: Request, res: Response) {
 
     const recipe: GetRecipe[] = await RecipeModel.getRecipe(recipeId);
     const formattedRecipe = _formatRecipe(recipe);
-    return res.json({ formattedRecipe });
+    return res.json({ recipe: formattedRecipe });
 }
 
 async function uploadRecipeImage(req: Request, res: Response) {

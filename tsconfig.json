@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig to read more about this file */
+
+    "target": "ES6",               
+    "experimentalDecorators": true, // Enable experimental decorators (for decorators support)
+    "module": "CommonJS",          
+    "resolveJsonModule": true,      // Enable JSON module imports
+    "outDir": "./dist",             // Output directory for compiled files
+    //"rootDir": "./src",             
+    "declaration": true,            // Generate declaration files (.d.ts)
+    "sourceMap": true,              // Generate source maps for debugging
+    "isolatedModules": true,        // Enable stricter module isolation
+    "emitDecoratorMetadata": true,   // Emit metadata for decorators
+    "esModuleInterop": true,        // Enable ES module interoperability
+    "forceConsistentCasingInFileNames": true, // Enforce consistent file naming
+    "strict": true,                
+    "skipLibCheck": true,          // Skip type checking of declaration files
+  },
+  "include": ["src/**/*"],      
+  "exclude": ["node_modules"]      
+}

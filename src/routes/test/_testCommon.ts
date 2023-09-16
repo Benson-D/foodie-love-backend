@@ -1,9 +1,8 @@
-"use strict";
+import db from "../../configs/db";
+import { createToken } from "../../utils/token";
 
-const db = require("../../configs/db.js");
-const RecipeModel = require("../../models/RecipeModel.js");
-const User = require("../../models/UserModel.js");
-const { createToken } = require("../../utils/token");
+import RecipeModel from "../../models/recipeModel";
+import UserModel from "../../models/userModel";
 
 async function commonBeforeAll() {
   // noinspection SqlWithoutWhere
@@ -21,7 +20,7 @@ async function commonBeforeAll() {
             prepTime: 1,
             cookingTime: 10, 
             instructions: 'this is a test recipe, this is testing routes 1',
-            recipeImage: null,
+            recipeImage: '',
             mealType: "vegan"
         });
 
@@ -31,7 +30,7 @@ async function commonBeforeAll() {
             prepTime: 2,
             cookingTime: 20, 
             instructions: 'this is a test recipe, this is testing routes 2',
-            recipeImage: null,
+            recipeImage: '',
             mealType: "italian"
         });
     await RecipeModel.insertRecipe(
@@ -40,12 +39,12 @@ async function commonBeforeAll() {
             prepTime: 3,
             cookingTime: 30, 
             instructions: 'this is a test recipe, this is testing routes 3',
-            recipeImage: null,
+            recipeImage: '',
             mealType: "mexican"
         });
   
 
-    await User.register({
+    await UserModel.register({
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",
@@ -53,7 +52,7 @@ async function commonBeforeAll() {
       password: "password1",
       isAdmin: false,
     });
-    await User.register({
+    await UserModel.register({
       username: "u2",
       firstName: "U2F",
       lastName: "U2L",
@@ -61,7 +60,7 @@ async function commonBeforeAll() {
       password: "password2",
       isAdmin: false,
     });
-    await User.register({
+    await UserModel.register({
       username: "u3",
       firstName: "U3F",
       lastName: "U3L",
@@ -88,12 +87,12 @@ const u1Token = createToken({ username: "u1", isAdmin: false });
 const u2Token = createToken({ username: "u2", isAdmin: false });
 const adminToken = createToken({ username: "admin", isAdmin: true });
 
-  module.exports = {
-    commonBeforeAll,
-    commonBeforeEach,
-    commonAfterEach,
-    commonAfterAll,
-    u1Token,
-    u2Token,
-    adminToken
-  };
+export  {
+  commonBeforeAll,
+  commonBeforeEach,
+  commonAfterEach,
+  commonAfterAll,
+  u1Token,
+  u2Token,
+  adminToken
+};

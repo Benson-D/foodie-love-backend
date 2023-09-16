@@ -1,18 +1,15 @@
-"use strict";
+import { json } from "express";
+import request from "supertest";
+import app from "../../app";
 
-const { json } = require("express");
-const request = require("supertest");
-
-const app = require("../../app.js");
-
-const {
+import {
   commonBeforeAll,
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
   u1Token,
   adminToken
-} = require("./_testCommon");
+} from "./_testCommon";
 
 beforeAll(commonBeforeAll);
 beforeEach(commonBeforeEach);
@@ -120,7 +117,7 @@ describe("GET / recipes", function() {
                 recipeName: "recipe_1",
                 prepTime: 1,
                 cookingTime: 10,
-                recipeImage: null,
+                recipeImage: '',
                 mealType: "vegan"
             }, 
             { 
@@ -128,7 +125,7 @@ describe("GET / recipes", function() {
                 recipeName: "recipe_2",
                 prepTime: 2,
                 cookingTime: 20, 
-                recipeImage: null,
+                recipeImage: '',
                 mealType: "italian"
             },         
             { 
@@ -136,7 +133,7 @@ describe("GET / recipes", function() {
                 recipeName: "recipe_3",
                 prepTime: 3,
                 cookingTime: 30, 
-                recipeImage: null,
+                recipeImage: '',
                 mealType: "mexican"
             } 
         ]})

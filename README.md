@@ -11,7 +11,7 @@ The backend utilizes TypeScript, Node, Express, AWS, and PostgreSQL.
 
 - `cd` into the project directory
 - `pnpm install` to install the dependencies needed for the application
-- Sets a pre commit hook for prettier to be used after every git add
+- Sets a pre commit hook for prettier to be used after every git commit
 
 ```console
 pnpm install

@@ -1,21 +1,21 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://our.company.com/recipeSearch.schema.json",
-    "type": "object",
-    "properties": {
-      "recipeName": {
-        "type": "string"
-      },
-      "cookingTime": {
-        "type": "number"
-      },
-      "mealType": {
-        "type": "string"
-      },
-      "skip": {
-        "type": "number"
-      }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://our.company.com/recipeSearch.schema.json",
+  "type": "object",
+  "properties": {
+    "recipeName": {
+      "type": "string"
     },
-    "additionalProperties": false,
-    "required": []
-  }
+    "cookingTime": {
+      "type": "number"
+    },
+    "mealType": {
+      "type": "string"
+    },
+    "skip": {
+      "type": "number"
+    }
+  },
+  "additionalProperties": false,
+  "required": []
+}

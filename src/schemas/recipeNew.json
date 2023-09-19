@@ -1,34 +1,30 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "http://our.company.com/recipeNew.schema.json",
-    "type": "object",
-    "properties": {
-      "recipeName": {
-        "type": "string"
-      },
-      "prepTime": {
-        "type": "number"
-      },
-      "cookingTime": {
-        "type": "number"
-      },
-      "instructions": {
-        "type": "string"
-      },
-      "mealType": {
-        "type": "string"
-      },
-      "recipeImage": {
-        "type": "string"
-      },
-      "ingredientList": {
-          "type": "string"
-      }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://our.company.com/recipeNew.schema.json",
+  "type": "object",
+  "properties": {
+    "recipeName": {
+      "type": "string"
     },
-    "additionalProperties": false,
-    "required": [
-      "recipeName",
-      "cookingTime"
-    ]
-  }
-  
+    "prepTime": {
+      "type": "number"
+    },
+    "cookingTime": {
+      "type": "number"
+    },
+    "instructions": {
+      "type": "string"
+    },
+    "mealType": {
+      "type": "string"
+    },
+    "recipeImage": {
+      "type": "string"
+    },
+    "ingredientList": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["recipeName", "cookingTime"]
+}

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { SECRET_KEY } from "../configs/general";
 import { UnauthorizedError } from "../utils/expressError";
 
-/** 
+/**
  * Middleware: Authenticate user.
  *
  * If a token was provided, verify it, and, if valid, store the token payload
@@ -24,21 +24,18 @@ function authenticateJWT(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-/** 
+/**
  * Middleware to use when they must be logged in.
  *
  * If not, raises Unauthorized.
  */
-function ensureLoggedIn(req: Request, res: Response, next: NextFunction) {
-    try {
-        if(!res.locals.user) throw new UnauthorizedError();
-        return next();
-    } catch(err) {
-        return next(err);
-    }
+function ensureLoggedIn(res: Response, next: NextFunction) {
+  try {
+    if (!res.locals.user) throw new UnauthorizedError();
+    return next();
+  } catch (err) {
+    return next(err);
+  }
 }
 
-export {
-    authenticateJWT,
-    ensureLoggedIn,
-};
+export { authenticateJWT, ensureLoggedIn };

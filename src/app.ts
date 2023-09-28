@@ -1,7 +1,7 @@
+import "./configs/passport";
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
-
 import { NotFoundError, ExpressError } from "./utils/expressError";
 import recipeRoutes from "./routes/recipes";
 import authRoutes from "./routes/auth";

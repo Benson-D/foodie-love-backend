@@ -6,7 +6,7 @@ import { validate } from "jsonschema";
 import authToken from "../schemas/authToken.json";
 import authRegister from "../schemas/authRegister.json";
 import UserModel from "../models/userModel";
-import passport from "../configs/passport";
+import passport from "passport";
 
 const router: Router = Router();
 
@@ -90,7 +90,7 @@ router.post("/refresh", async function (req: Request, res: Response) {
 });
 
 router.get(
-  "/login",
+  "/google",
   passport.authenticate("google", { scope: ["email", "profile"] }),
 );
 

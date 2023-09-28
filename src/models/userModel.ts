@@ -244,7 +244,7 @@ class UserModel {
    * @param {string} username
    */
   public static async remove(username: string): Promise<void> {
-    let result = await db.query(
+    const result = await db.query(
       `DELETE
         FROM users
         WHERE username = $1

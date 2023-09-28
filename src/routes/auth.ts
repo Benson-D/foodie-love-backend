@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, Request, Response } from "express";
 import jwt, { VerifyErrors } from "jsonwebtoken";
 import { createToken } from "../utils/token";
 import { REFRESH_TIME, SECRET_KEY } from "../configs/general";
@@ -6,6 +6,7 @@ import { validate } from "jsonschema";
 import authToken from "../schemas/authToken.json";
 import authRegister from "../schemas/authRegister.json";
 import UserModel from "../models/userModel";
+import passport from "../configs/passport";
 
 const router: Router = Router();
 
@@ -72,6 +73,7 @@ router.post("/refresh", async function (req: Request, res: Response) {
     jwt.verify(
       refreshToken,
       SECRET_KEY as string,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       async (err: VerifyErrors | null, decoded: any | undefined) => {
         if (err || !decoded.username) {
           return res.status(401).json({ errors: "Invalid refresh token" });
@@ -85,6 +87,15 @@ router.post("/refresh", async function (req: Request, res: Response) {
   } catch (err) {
     return res.status(401).json({ errors: "Invalid refresh token" });
   }
+});
+
+router.get(
+  "/login",
+  passport.authenticate("google", { scope: ["email", "profile"] }),
+);
+
+router.get("/google/redirect", passport.authenticate("google"), (req, res) => {
+  res.send("This is the callback route");
 });
 
 export default router;

@@ -19,6 +19,9 @@ const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === "test" ? 1 : 12;
 const TOKEN_TIME = process.env.TOKEN_TIME;
 const REFRESH_TIME = process.env.REFRESH_TIME;
 
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID as string;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET as string;
+
 console.log("Foodie Love Config:");
 console.log("SECRET_KEY:", SECRET_KEY);
 console.log("PORT:", PORT.toString());
@@ -33,4 +36,6 @@ export {
   getDatabaseUri,
   TOKEN_TIME,
   REFRESH_TIME,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
 };

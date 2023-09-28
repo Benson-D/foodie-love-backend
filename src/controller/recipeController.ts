@@ -41,89 +41,92 @@ interface FormattedRecipe {
   ingredients: IngredientItems[];
 }
 
-
 async function createRecipe(req: Request, res: Response) {
-    const validator = validate(req.body, recipeNewSchema);
+  const validator = validate(req.body, recipeNewSchema);
 
-    if(!validator.valid) {
-        const errs = validator.errors.map(e => e.stack);
-        console.log(errs, 'error');
-        return res.status(400).json({ errors: errs });
-    }
+  if (!validator.valid) {
+    const errs = validator.errors.map((e) => e.stack);
+    console.log(errs, "error");
+    return res.status(400).json({ errors: errs });
+  }
 
-    const recipe = await RecipeModel.insertRecipe(req.body);
-    
-    const { ingredientList } = req.body; 
-    const recipeIngredients = JSON.parse(ingredientList);
+  const recipe = await RecipeModel.insertRecipe(req.body);
 
-    const responseIngredients = await Promise.all(recipeIngredients.map( 
-        async (list: {  
-            amount: string;
-            measurement: string;
-            ingredient: string;}) => await _ingredientBuilder(recipe.id, list)));
-            
-     const output = {
-        id: recipe.id,
-        ingredients: [...responseIngredients]
-     }   
-    
-    return res.status(201).json({ recipe: output });
+  const { ingredientList } = req.body;
+  const recipeIngredients = JSON.parse(ingredientList);
+
+  const responseIngredients = await Promise.all(
+    recipeIngredients.map(
+      async (list: {
+        amount: string;
+        measurement: string;
+        ingredient: string;
+      }) => await _ingredientBuilder(recipe.id, list),
+    ),
+  );
+
+  const output = {
+    id: recipe.id,
+    ingredients: [...responseIngredients],
+  };
+
+  return res.status(201).json({ recipe: output });
 }
 
 /**
  * Gets a list of recipes
- * 
+ *
  * @param {Request} req - The HTTP request object containing query parameters.
  * @param {Response} res - The HTTP response object to send the recipe list.
- * @returns 
+ * @returns
  */
 async function getAllRecipes(req: Request, res: Response) {
-    const recipeQuery = req.query as Record<string, string | number>;; 
+  const recipeQuery = req.query as Record<string, string | number>;
 
-    if (recipeQuery?.skip) {
-        recipeQuery.skip = Number(recipeQuery.skip);
-    } else {
-        recipeQuery['skip'] = 0;
-    }
-    
-    if (recipeQuery?.cookingTime) {
-        recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
-    };
+  if (recipeQuery?.skip) {
+    recipeQuery.skip = Number(recipeQuery.skip);
+  } else {
+    recipeQuery["skip"] = 0;
+  }
 
-    // Validate the query parameters against a predefined schema.
-    const validator = validate(recipeQuery, recipeSearchSchema);
+  if (recipeQuery?.cookingTime) {
+    recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
+  }
 
-    if (!validator.valid) {
-      const errs = validator.errors.map((e) => e.stack);
-      return res.status(400).json({ errors: errs });
-    }
+  // Validate the query parameters against a predefined schema.
+  const validator = validate(recipeQuery, recipeSearchSchema);
 
-    try {
-        const recipes = await RecipeModel.findAll(recipeQuery);
-        return res.json({ recipes });
-    } catch (error) {
-        return res.status(500).json({ error: 'Internal Server Error' });
-    }
+  if (!validator.valid) {
+    const errs = validator.errors.map((e) => e.stack);
+    return res.status(400).json({ errors: errs });
+  }
+
+  try {
+    const recipes = await RecipeModel.findAll(recipeQuery);
+    return res.json({ recipes });
+  } catch (error) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
 }
 
 async function getIndividualRecipe(req: Request, res: Response) {
-    const recipeId = Number(req.params.id);
+  const recipeId = Number(req.params.id);
 
-    const recipe: GetRecipe[] = await RecipeModel.getRecipe(recipeId);
-    const formattedRecipe = _formatRecipe(recipe);
-    return res.json({ recipe: formattedRecipe });
+  const recipe: GetRecipe[] = await RecipeModel.getRecipe(recipeId);
+  const formattedRecipe = _formatRecipe(recipe);
+  return res.json({ recipe: formattedRecipe });
 }
 
 async function uploadRecipeImage(req: Request, res: Response) {
-    const image = req.file || '';
-    let urlResponse = '';
+  const image = req.file || "";
+  let urlResponse = "";
 
-    if (image) {
-      urlResponse = await uploadImageToS3(image);
-      await unlink(image.path);
-    }
+  if (image) {
+    urlResponse = await uploadImageToS3(image);
+    await unlink(image.path);
+  }
 
-    return res.status(201).json({ url: urlResponse || '' });
+  return res.status(201).json({ url: urlResponse || "" });
 }
 
 // async function recipeUpdate(req, res) {
@@ -132,29 +135,28 @@ async function uploadRecipeImage(req: Request, res: Response) {
 // }
 
 async function deleteRecipe(req: Request, res: Response) {
-   const recipeId = Number(req.params.id);
+  const recipeId = Number(req.params.id);
 
-    await RecipeModel.removeRecipe(recipeId);
-    return res.json({ deleted: req.params.id });
+  await RecipeModel.removeRecipe(recipeId);
+  return res.json({ deleted: req.params.id });
 }
-
 
 /******************************* Helpers **************************************/
 
 /**
  * Given the recipe data, return the recipe for readable format.
- * 
- * @param {GetRecipe[]} recipe 
- * @returns {FormattedRecipe} 
- * { id: 0, 
- *   recipeName: "test recipe", 
- *   prepTime: 1, 
- *   cookingTime: 2,  
- *   image: null, 
- *   ingredients: [{ 
- *       "amount": "4.0", 
- *       "measurement": "cup", 
- *       "ingredient": "testIngredient" 
+ *
+ * @param {GetRecipe[]} recipe
+ * @returns {FormattedRecipe}
+ * { id: 0,
+ *   recipeName: "test recipe",
+ *   prepTime: 1,
+ *   cookingTime: 2,
+ *   image: null,
+ *   ingredients: [{
+ *       "amount": "4.0",
+ *       "measurement": "cup",
+ *       "ingredient": "testIngredient"
  *   }, ...]};
  */
 function _formatRecipe(recipe: GetRecipe[]): FormattedRecipe {
@@ -170,86 +172,88 @@ function _formatRecipe(recipe: GetRecipe[]): FormattedRecipe {
   };
 
   for (const item of recipe) {
+    const minuteStatement = Number(item.prepTime) > 1 ? "minutes" : "minute";
 
-      let minuteStatement = Number(item.prepTime) > 1 ? 'minutes' : 'minute';
+    recipeList.id = item.id;
+    recipeList.recipeName = item.recipeName;
+    recipeList.prepTime = `${item.prepTime} ${minuteStatement}`;
+    recipeList.cookingTime = `${item.cookingTime} minutes`;
+    recipeList.recipeImage = item?.recipeImage;
+    recipeList.mealType = item.mealType;
+    recipeList.instructions = item.instructions;
 
-      recipeList.id = item.id;
-      recipeList.recipeName = item.recipeName;
-      recipeList.prepTime = `${item.prepTime} ${minuteStatement}`; 
-      recipeList.cookingTime = `${item.cookingTime} minutes`; 
-      recipeList.recipeImage = item?.recipeImage; 
-      recipeList.mealType = item.mealType;
-      recipeList.instructions = item.instructions;
+    const ingredientList: IngredientItems = {
+      amount: item.amount,
+      measurementId: item?.measurementId,
+      measurement: item?.measurement,
+      ingredientId: item.ingredientId,
+      ingredient: item.ingredient,
+    };
 
-      const ingredientList: IngredientItems =
-          { 
-              amount: item.amount,
-              measurementId: item?.measurementId,
-              measurement: item?.measurement,
-              ingredientId: item.ingredientId,
-              ingredient: item.ingredient,
-
-          };
-      
-      if (recipeList.ingredients) {
-          recipeList.ingredients.push(ingredientList);
-      } else {
-          recipeList.ingredients = [ingredientList];
-      }
+    if (recipeList.ingredients) {
+      recipeList.ingredients.push(ingredientList);
+    } else {
+      recipeList.ingredients = [ingredientList];
+    }
   }
 
   return recipeList;
 }
 
-
 async function _ingredientBuilder(
-  recipeId: number, 
-  recipeItems: { amount: string; measurement: string; ingredient: string;}): Promise<{    
-    recipeId: number;
-    measurementId?: number | undefined;
-    ingredientId: number;
-    amount: number;}> {
-    if (typeof recipeId !== 'number') {
-        throw new BadRequestError('Not a valid id');
-    }
-    
-    const { amount, measurement, ingredient } = recipeItems;
-    
-    const measurementId = await insertMeasurement(measurement);
-    const ingredientId = await insertIngredient(ingredient);
-    const parsedAmount = parseRecipeAmount(amount);
-    
-    const recipeData = { 
-        recipeId: recipeId, 
-        measurementId: measurementId,
-        ingredientId: ingredientId, 
-        amount: parsedAmount
-    };
-    
-    const result = await RecipeModel.insertRecipeIngredients(recipeData);
-    return result;
+  recipeId: number,
+  recipeItems: { amount: string; measurement: string; ingredient: string },
+): Promise<{
+  recipeId: number;
+  measurementId?: number | undefined;
+  ingredientId: number;
+  amount: number;
+}> {
+  if (typeof recipeId !== "number") {
+    throw new BadRequestError("Not a valid id");
+  }
+
+  const { amount, measurement, ingredient } = recipeItems;
+
+  const measurementId = await insertMeasurement(measurement);
+  const ingredientId = await insertIngredient(ingredient);
+  const parsedAmount = parseRecipeAmount(amount);
+
+  const recipeData = {
+    recipeId: recipeId,
+    measurementId: measurementId,
+    ingredientId: ingredientId,
+    amount: parsedAmount,
+  };
+
+  const result = await RecipeModel.insertRecipeIngredients(recipeData);
+  return result;
 }
 
 function parseRecipeAmount(amount: string): number {
-    let parsedAmount = amount;
+  let parsedAmount = amount;
 
-    if (amount.includes('/')) {
-        parsedAmount = amount.split('/')
-                       .map(Number)
-                       .reduce((total, amount) => total / amount).toString();
-    } 
+  if (amount.includes("/")) {
+    parsedAmount = amount
+      .split("/")
+      .map(Number)
+      .reduce((total, amount) => total / amount)
+      .toString();
+  }
 
-    return parseFloat(parsedAmount);
+  return parseFloat(parsedAmount);
 }
 
 async function insertIngredient(ingredient: string): Promise<number> {
-    const response = await RecipeModel.insertIngredients(ingredient);
-    return response.id;
+  const response = await RecipeModel.insertIngredients(ingredient);
+  return response.id;
 }
 
-async function insertMeasurement(measurement: string): Promise<number | undefined> {
-    const response = await RecipeModel.insertMeasurements(measurement);
-    return response?.id ?? undefined;
+async function insertMeasurement(
+  measurement: string,
+): Promise<number | undefined> {
+  const response = await RecipeModel.insertMeasurements(measurement);
+  return response?.id ?? undefined;
 }
 
 export {
@@ -257,5 +261,5 @@ export {
   getIndividualRecipe,
   createRecipe,
   uploadRecipeImage,
-  deleteRecipe
-}
+  deleteRecipe,
+};

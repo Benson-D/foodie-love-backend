@@ -22,6 +22,8 @@ const REFRESH_TIME = process.env.REFRESH_TIME;
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID as string;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET as string;
 
+const COOKIE_SECRET = process.env.COOKIE_SECRET as string;
+
 console.log("Foodie Love Config:");
 console.log("SECRET_KEY:", SECRET_KEY);
 console.log("PORT:", PORT.toString());
@@ -38,4 +40,5 @@ export {
   REFRESH_TIME,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
+  COOKIE_SECRET,
 };

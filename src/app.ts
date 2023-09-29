@@ -2,11 +2,25 @@ import "./configs/passport";
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
+import cookieSession from "cookie-session";
+import passport from "passport";
 import { NotFoundError, ExpressError } from "./utils/expressError";
 import recipeRoutes from "./routes/recipes";
 import authRoutes from "./routes/auth";
+import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
+
+app.use(
+  cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [COOKIE_SECRET],
+  }),
+);
+
+// initialize passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors());
 app.use(express.json());

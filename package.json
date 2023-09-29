@@ -29,13 +29,14 @@
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
     "multer": "1.4.5-lts.1",
-    "passport": "^0.6.0",
+    "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
     "pg": "^8.11.3",
     "schema": "^0.2.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/cookie-session": "^2.0.45",
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.5",

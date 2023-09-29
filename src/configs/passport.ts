@@ -12,10 +12,18 @@ passport.use(
       callbackURL: "/auth/google/redirect",
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log(accessToken, refreshToken);
+      console.log(accessToken, refreshToken, profile, "<=== profile data ===>");
       // get profile details
       // save profile details in db
       return done(null, profile);
     },
   ),
 );
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser(async (user, done) => {
+  done(null, user);
+});

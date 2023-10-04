@@ -12,6 +12,18 @@ import { COOKIE_SECRET } from "./configs/general";
 const app: Express = express();
 
 app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
+app.use(express.json());
+app.use(morgan("tiny"));
+
+app.use("/recipes", recipeRoutes);
+app.use("/auth", authRoutes);
+
+app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: [COOKIE_SECRET],
@@ -21,13 +33,6 @@ app.use(
 // initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(cors());
-app.use(express.json());
-app.use(morgan("tiny"));
-
-app.use("/recipes", recipeRoutes);
-app.use("/auth", authRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req: Request, res: Response, next: NextFunction) {

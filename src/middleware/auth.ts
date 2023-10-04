@@ -38,4 +38,12 @@ function ensureLoggedIn(res: Response, next: NextFunction) {
   }
 }
 
-export { authenticateJWT, ensureLoggedIn };
+function checkAuthenticate(req: Request, res: Response, next: NextFunction) {
+  if (!req.user) {
+    res.redirect("/auth/google");
+  } else {
+    next();
+  }
+}
+
+export { authenticateJWT, ensureLoggedIn, checkAuthenticate };

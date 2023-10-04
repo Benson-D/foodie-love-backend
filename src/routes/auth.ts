@@ -94,8 +94,16 @@ router.get(
   passport.authenticate("google", { scope: ["email", "profile"] }),
 );
 
-router.get("/google/redirect", passport.authenticate("google"), (req, res) => {
-  res.send("This is the callback route");
-});
+router.get(
+  "/google/redirect",
+  passport.authenticate("google", {
+    failureMessage: "Cannot login to Google, please try again later!",
+    failureRedirect: "http://localhost:5173/login/error",
+    successRedirect: "http://localhost:5173/login/success",
+  }),
+  (req: Request, res: Response) => {
+    res.send("Thank you for signing in!");
+  },
+);
 
 export default router;

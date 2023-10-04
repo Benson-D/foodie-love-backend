@@ -11,19 +11,32 @@ passport.use(
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL: "/auth/google/redirect",
     },
-    async (accessToken, refreshToken, profile, done) => {
-      console.log(accessToken, refreshToken, profile, "<=== profile data ===>");
-      // get profile details
-      // save profile details in db
-      return done(null, profile);
+    async (accessToken, refreshToken, profile, cb) => {
+      const userData = {
+        googleId: profile.id,
+        firstName: profile.name?.givenName,
+        lastName: profile.name?.familyName,
+        email: profile.emails?.[0].value,
+        image: profile.photos?.[0].value,
+      };
+
+      console.log(userData, "data to store in db");
+      return cb(null, profile);
     },
   ),
 );
 
-passport.serializeUser((user, done) => {
-  done(null, user);
+passport.serializeUser((user, cb) => {
+  cb(null, user);
 });
 
-passport.deserializeUser(async (user, done) => {
-  done(null, user);
+type UserDocument = {
+  id: string;
+  username: string;
+  email: string;
+  googleId: string;
+};
+
+passport.deserializeUser(async (user, cb) => {
+  cb(null, user as UserDocument);
 });

@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+
 CREATE TABLE recipes (
     id SERIAL PRIMARY KEY, 
     recipe_name TEXT NOT NULL, 
@@ -30,30 +32,34 @@ CREATE TABLE recipe_ingredients (
 );
 
 CREATE TABLE users (
-  username VARCHAR(25) PRIMARY KEY,
-  password TEXT NOT NULL,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  email TEXT NOT NULL
-    CHECK (position('@' IN email) > 1),
-  image_url TEXT,
-  is_admin BOOLEAN NOT NULL DEFAULT FALSE
+    id UUID PRIMARY KEY DEFAULT get_random_uuid()
+    username VARCHAR(25) 
+    google_id INTEGER,
+    discord_id INTEGER,
+    github_id INTEGER,
+    password TEXT,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL
+    email TEXT NOT NULL
+        CHECK (position('@' IN email) > 1),
+    image_url TEXT,
+    is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE users_recipes (
-    username VARCHAR(25) 
+    id VARCHAR(25) 
         REFERENCES users ON DELETE CASCADE, 
     recipe_id INTEGER 
         REFERENCES recipes ON DELETE CASCADE,
-    PRIMARY KEY (username, recipe_id)
+    PRIMARY KEY (id, recipe_id)
 );
 
 CREATE TABLE users_groceries (
-    username VARCHAR(25)
+    id VARCHAR(25)
         REFERENCES users ON DELETE CASCADE,
     ingredient_id INTEGER
         REFERENCES ingredients ON DELETE CASCADE,
-    PRIMARY KEY (username, ingredient_id)
+    PRIMARY KEY (id, ingredient_id)
 );
 
 

@@ -36,13 +36,13 @@ CREATE TABLE users (
     username VARCHAR(25), 
     google_id INTEGER,
     discord_id INTEGER,
-    github_id INTEGER,
     password TEXT,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT NOT NULL
         CHECK (position('@' IN email) > 1),
     image_url TEXT,
+    refresh_token TEXT,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 

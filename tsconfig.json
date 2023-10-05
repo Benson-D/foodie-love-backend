@@ -16,7 +16,7 @@
     "forceConsistentCasingInFileNames": true, // Enforce consistent file naming
     "strict": true,
     "skipLibCheck": true, // Skip type checking of declaration files
-    "typeRoots": ["./src/typings/", "./node_modules/@types"]
+    "typeRoots": ["./src/typings", "./node_modules/@types"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

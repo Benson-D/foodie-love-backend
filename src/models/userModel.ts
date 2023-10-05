@@ -110,37 +110,6 @@ class UserModel {
     return user;
   }
 
-  public static async createOne({
-    googleId,
-    firstName,
-    lastName,
-    email,
-    imageUrl,
-    isAdmin,
-  }: {
-    googleId: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    imageUrl: string;
-    isAdmin?: boolean;
-  }) {
-    const result = await db.query(
-      `INSERT INTO users
-            (google_id, first_name, last_name, email, image_url, is_admin)
-            VALUES ($1, $2, $3, $4, $5, $6)
-            RETURNING google_id AS "googleId", 
-                    first_name AS "firstName", 
-                    last_name AS "lastName", 
-                    email, 
-                    is_admin AS "isAdmin"`,
-      [googleId, firstName, lastName, email, imageUrl, isAdmin ?? false],
-    );
-
-    const user = result.rows[0];
-    return user;
-  }
-
   /**
    * Find all users from recipe database
    *
@@ -168,7 +137,7 @@ class UserModel {
     return users.rows;
   }
 
-  public static async findOne(googleId: string) {
+  public static async findById(googleId: string) {
     const userRes = await db.query(
       `SELECT username,
               google_id AS "googleId",
@@ -183,8 +152,49 @@ class UserModel {
     );
 
     const user = userRes.rows[0];
+    return user;
+  }
 
-    if (!user) throw new NotFoundError(`No user: ${googleId}`);
+  public static async findOrCreate(
+    googleId: string,
+    defaultUser: {
+      googleId: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      imageUrl: string;
+      isAdmin?: boolean;
+    },
+  ): Promise<{
+    username: string;
+    googleId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    imageUrl: string;
+    isAdmin: boolean;
+  }> {
+    let user = await this.findById(googleId);
+
+    if (!user) {
+      const { googleId, firstName, lastName, email, imageUrl, isAdmin } =
+        defaultUser;
+
+      const result = await db.query(
+        `INSERT INTO users
+              (google_id, first_name, last_name, email, image_url, is_admin)
+              VALUES ($1, $2, $3, $4, $5, $6)
+              RETURNING google_id AS "googleId", 
+                      first_name AS "firstName", 
+                      last_name AS "lastName", 
+                      email, 
+                      is_admin AS "isAdmin"`,
+        [googleId, firstName, lastName, email, imageUrl, isAdmin ?? false],
+      );
+
+      user = result.rows[0];
+    }
+
     return user;
   }
 

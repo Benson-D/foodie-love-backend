@@ -1,6 +1,7 @@
 import UserModel from "../models/userModel";
 import { createToken } from "../utils/token";
 import { Router } from "express";
+import { isUserAuthenticated } from "../middleware/auth";
 
 const router: Router = Router();
 
@@ -41,6 +42,10 @@ router.get("/:username", async function (req, res, next) {
   } catch (err) {
     return next(err);
   }
+});
+
+router.get("/auth", isUserAuthenticated, (req, res) => {
+  res.json(req.user);
 });
 
 export default router;

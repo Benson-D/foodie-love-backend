@@ -6,6 +6,7 @@ import cookieSession from "cookie-session";
 import passport from "passport";
 import { NotFoundError, ExpressError } from "./utils/expressError";
 import recipeRoutes from "./routes/recipes";
+import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import { COOKIE_SECRET } from "./configs/general";
 
@@ -22,6 +23,7 @@ app.use(morgan("tiny"));
 
 app.use("/recipes", recipeRoutes);
 app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
 
 app.use(
   cookieSession({

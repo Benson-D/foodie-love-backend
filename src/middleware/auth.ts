@@ -38,7 +38,7 @@ function ensureLoggedIn(res: Response, next: NextFunction) {
   }
 }
 
-function checkAuthenticate(req: Request, res: Response, next: NextFunction) {
+function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (!req.user) {
     res.redirect("/auth/google");
   } else {
@@ -46,4 +46,4 @@ function checkAuthenticate(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { authenticateJWT, ensureLoggedIn, checkAuthenticate };
+export { authenticateJWT, ensureLoggedIn, isUserAuthenticated };

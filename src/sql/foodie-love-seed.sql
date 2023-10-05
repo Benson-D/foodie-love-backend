@@ -1,11 +1,5 @@
 INSERT INTO users (username, password, first_name, last_name, email, is_admin)
-VALUES ('testuser',
-        '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q',
-        'Test',
-        'User',
-        'dbenson3091@gmail.com',
-        FALSE),
-       ('testadmin',
+VALUES ('testadmin',
         '$2b$12$AZH7virni5jlTTiGgEg4zu3lSvAw68qVEfSIOjJ3RqtbJbdW/Oi5q',
         'Test',
         'Admin',
@@ -13,8 +7,32 @@ VALUES ('testuser',
         TRUE);
 
 INSERT INTO recipes (recipe_name, prep_time, cooking_time, recipe_image, instructions, meal_type)
-VALUES ('lemon tahini quinoa salad', 5, 25, NULL, '1. Heat 2 cups water and quinoa until boiling in medium saucepan over high heat, reduce heat to medium-low and simmer until water is absorbed and quinoa fluffs up, about 15 minutes. Quinoa is done when it is tender and there is a pop to each bite. Drain water and place quinoa in mixing bowl 2. Add onion, broccoli, peppers, tomoatoes, and chickpeas 3. To make the sauce, whisk together all the ingredients 4. Add the sauce to the cooked quinoa and vegetables 5. Serve garnished with a bit of cilantro', 'vegan'),
-       ('savory spaghetti squash', 25, 45, NULL, '1. Preheat oven to 350°F 2. Cut squash lengthwise and clean out seeds. Place squash cut sides down on a nonstick baking sheet. Bake for 45 minutes or until the squash is easily pierced with a sharp knife. Remove squash from oven and set aside to cool enough to be easily handled 3. While squash is baking, sauté onion and garlic with 2 tablespoons vegetable broth in a medium-sized skillet over medium heat until onion is soft. Add remaining vegetable broth, tomatoes, pepper, spices, and lemon juice. Cook for 5-8 minutes. Season with salt and pepper. Set aside. 4 Using a fork, gently pull the strands of squash away from the peel. Place the strands onto a large serving bowl 5. Add tomato mixture to squash and mix gently. Serve warm.', 'vegan');
+VALUES (
+       'lemon tahini quinoa salad', 
+       5, 
+       25, 
+       NULL, 
+       '[
+              { "description": "Heat 2 cups water and quinoa until boiling in medium saucepan over high heat, reduce heat to medium-low and simmer until water is absorbed and quinoa fluffs up, about 15 minutes. Quinoa is done when it is tender and there is a pop to each bite. Drain water and place quinoa in mixing bowl"}, 
+              { "description": "Add onion, broccoli, peppers, tomoatoes, and chickpeas"}, 
+              { "description": "To make the sauce, whisk together all the ingredients"}, 
+              { "description": "Add the sauce to the cooked quinoa and vegetables"}, 
+              { "description": "Serve garnished with a bit of cilantro"}
+       ]', 
+       'vegan'),
+       (
+       'savory spaghetti squash', 
+       25, 
+       45, 
+       NULL, 
+       '
+       [
+              {"description": "Preheat oven to 350°F"}, 
+              {"description": "Cut squash lengthwise and clean out seeds. Place squash cut sides down on a nonstick baking sheet. Bake for 45 minutes or until the squash is easily pierced with a sharp knife. Remove squash from oven and set aside to cool enough to be easily handled"},{"description": "While squash is baking, sauté onion and garlic with 2 tablespoons vegetable broth in a medium-sized skillet over medium heat until onion is soft. Add remaining vegetable broth, tomatoes, pepper, spices, and lemon juice. Cook for 5-8 minutes. Season with salt and pepper. Set aside."},
+              {"description": "Using a fork, gently pull the strands of squash away from the peel. Place the strands onto a large serving bowl"},
+              {"description": "Add tomato mixture to squash and mix gently. Serve warm"}
+       ]', 
+       'vegan');
 
 INSERT INTO ingredients (ingredient_name)
 VALUES ('spaghetti squash'), ('vegetable broth'), ('onion'), ('cloves garlic'), 

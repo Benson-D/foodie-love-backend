@@ -110,6 +110,37 @@ class UserModel {
     return user;
   }
 
+  public static async createOne({
+    googleId,
+    firstName,
+    lastName,
+    email,
+    imageUrl,
+    isAdmin,
+  }: {
+    googleId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    imageUrl: string;
+    isAdmin?: boolean;
+  }) {
+    const result = await db.query(
+      `INSERT INTO users
+            (google_id, first_name, last_name, email, image_url, is_admin)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING google_id AS "googleId", 
+                    first_name AS "firstName", 
+                    last_name AS "lastName", 
+                    email, 
+                    is_admin AS "isAdmin"`,
+      [googleId, firstName, lastName, email, imageUrl, isAdmin ?? false],
+    );
+
+    const user = result.rows[0];
+    return user;
+  }
+
   /**
    * Find all users from recipe database
    *
@@ -126,15 +157,35 @@ class UserModel {
   > {
     const users = await db.query(
       `SELECT username,
-                  first_name AS "firstName",
-                  CONCAT (first_name, ' ', last_name) AS "name",
-                  email,
-                  is_admin AS "isAdmin"
+              first_name AS "firstName",
+              CONCAT (first_name, ' ', last_name) AS "name",
+              email,
+              is_admin AS "isAdmin"
            FROM users
            ORDER BY username`,
     );
 
     return users.rows;
+  }
+
+  public static async findOne(googleId: string) {
+    const userRes = await db.query(
+      `SELECT username,
+              google_id AS "googleId",
+              first_name AS "firstName",
+              last_name AS "lastName",
+              email,
+              image_url AS "imageUrl",
+              is_admin AS "isAdmin"
+         FROM users
+         WHERE google_id = $1`,
+      [googleId],
+    );
+
+    const user = userRes.rows[0];
+
+    if (!user) throw new NotFoundError(`No user: ${googleId}`);
+    return user;
   }
 
   /**

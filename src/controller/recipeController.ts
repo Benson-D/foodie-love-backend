@@ -22,7 +22,7 @@ interface GetRecipe {
   cookingTime: string;
   recipeImage: string;
   mealType: string;
-  instructions: string;
+  instructions: { description: string }[];
   amount: number;
   measurementId: number | undefined;
   measurement: string | undefined;
@@ -37,7 +37,7 @@ interface FormattedRecipe {
   cookingTime: string;
   recipeImage: string | undefined;
   mealType: string;
-  instructions: string;
+  instructions: { description: string }[];
   ingredients: IngredientItems[];
 }
 
@@ -167,7 +167,7 @@ function _formatRecipe(recipe: GetRecipe[]): FormattedRecipe {
     cookingTime: "",
     recipeImage: "",
     mealType: "",
-    instructions: "",
+    instructions: [],
     ingredients: [],
   };
 

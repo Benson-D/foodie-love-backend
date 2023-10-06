@@ -9,7 +9,7 @@ interface GetRecipe {
   cookingTime: string;
   recipeImage: string;
   mealType: string;
-  instructions: string;
+  instructions: { description: string }[];
   amount: number;
   measurementId: number | undefined;
   measurement: string | undefined;

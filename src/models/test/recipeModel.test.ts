@@ -24,7 +24,7 @@ describe("create recipes", function () {
     prepTime: 15,
     cookingTime: 30,
     recipeImage: "http://new-recipe.img",
-    instructions: "testing creation of recipe",
+    instructions: JSON.stringify([{ description: "testing, recipe_1" }]),
     mealType: "italian",
   };
 
@@ -293,6 +293,7 @@ describe("findAll", function () {
 describe("get recipe", function () {
   test("finds a recipe", async function () {
     const recipe = await RecipeModel.getRecipe(recipeIds[0]);
+
     expect(recipe).toEqual([
       {
         id: recipeIds[0],
@@ -301,7 +302,7 @@ describe("get recipe", function () {
         cookingTime: 10,
         recipeImage: null,
         mealType: "vegan",
-        instructions: "testing, recipe_1",
+        instructions: [{ description: "testing, recipe_1" }],
         amount: "5",
         measurementId: measurementIds[0],
         measurement: "measurement_cup",
@@ -327,7 +328,9 @@ describe("update a curent recipe", function () {
     cookingTime: 10,
     prepTime: 1,
     recipeImage: "",
-    instructions: "adding test, update current recipe",
+    instructions: JSON.stringify([
+      { description: "adding test, update current recipe" },
+    ]),
     mealType: "italian",
   };
 
@@ -336,6 +339,10 @@ describe("update a curent recipe", function () {
       recipeIds[0],
       updateData,
     );
+
+    // const parsedInstructions = JSON.parse(updateRecipe.instructions);
+    // recipe[0].instructions = parsedInstructions;
+
     expect(updateRecipe).toEqual({
       id: recipeIds[0],
       recipeName: "update_recipe",
@@ -351,7 +358,7 @@ describe("update a curent recipe", function () {
         cookingTime: 10,
         recipeImage: "",
         mealType: "italian",
-        instructions: "adding test, update current recipe",
+        instructions: [{ description: "adding test, update current recipe" }],
         amount: "5",
         measurementId: measurementIds[0],
         measurement: "measurement_cup",

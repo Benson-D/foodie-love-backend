@@ -206,7 +206,8 @@ class UserModel {
    */
   public static async get(username: string) {
     const userRes = await db.query(
-      `SELECT username,
+      `SELECT id,
+              username,
                 first_name AS "firstName",
                 last_name AS "lastName",
                 email,
@@ -223,15 +224,15 @@ class UserModel {
     const userRecipes = await db.query(
       `SELECT recipe_id
            FROM users_recipes 
-           WHERE username = $1`,
-      [username],
+           WHERE user_id = $1`,
+      [user.id],
     );
 
     const userIngredienets = await db.query(
       `SELECT ingredient_id
            FROM users_groceries 
-           WHERE username = $1`,
-      [username],
+           WHERE user_id = $1`,
+      [user.id],
     );
 
     user.recipes = userRecipes.rows.map(

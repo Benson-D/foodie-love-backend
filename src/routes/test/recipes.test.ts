@@ -19,7 +19,8 @@ describe("POST /recipes ", function () {
     recipeName: "recipe_test",
     prepTime: 1,
     cookingTime: 10,
-    instructions: "this is a test recipe, this is testing routes creation",
+    instructions:
+      '[{"description": "this is a test recipe, this is testing routes creation"}]',
     mealType: "vegan",
     ingredientList: JSON.stringify([]),
   };
@@ -28,7 +29,8 @@ describe("POST /recipes ", function () {
     recipeName: "recipe_test_1",
     prepTime: 1,
     cookingTime: 10,
-    instructions: "this is a test recipe, this is testing routes creation",
+    instructions:
+      '[{"description": "this is a test recipe, this is testing routes creation"}]',
     mealType: "vegan",
     ingredientList: JSON.stringify([
       {

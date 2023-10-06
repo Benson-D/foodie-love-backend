@@ -15,6 +15,7 @@ import {
   commonAfterAll,
   recipeIds,
   ingredientIds,
+  userIds,
 } from "./_testCommon";
 
 beforeAll(commonBeforeAll);
@@ -133,7 +134,9 @@ describe("findAll users", function () {
 describe("get", function () {
   test("works", async function () {
     const user = await UserModel.get("u1");
+
     expect(user).toEqual({
+      id: userIds[0],
       username: "u1",
       firstName: "U1F",
       lastName: "U1L",

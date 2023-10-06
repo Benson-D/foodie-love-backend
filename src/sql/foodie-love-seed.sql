@@ -13,11 +13,11 @@ VALUES (
        25, 
        NULL, 
        '[
-              { "description": "Heat 2 cups water and quinoa until boiling in medium saucepan over high heat, reduce heat to medium-low and simmer until water is absorbed and quinoa fluffs up, about 15 minutes. Quinoa is done when it is tender and there is a pop to each bite. Drain water and place quinoa in mixing bowl"}, 
-              { "description": "Add onion, broccoli, peppers, tomoatoes, and chickpeas"}, 
-              { "description": "To make the sauce, whisk together all the ingredients"}, 
-              { "description": "Add the sauce to the cooked quinoa and vegetables"}, 
-              { "description": "Serve garnished with a bit of cilantro"}
+              {"description": "Heat 2 cups water and quinoa until boiling in medium saucepan over high heat, reduce heat to medium-low and simmer until water is absorbed and quinoa fluffs up, about 15 minutes. Quinoa is done when it is tender and there is a pop to each bite. Drain water and place quinoa in mixing bowl"}, 
+              {"description": "Add onion, broccoli, peppers, tomoatoes, and chickpeas"}, 
+              {"description": "To make the sauce, whisk together all the ingredients"}, 
+              {"description": "Add the sauce to the cooked quinoa and vegetables"}, 
+              {"description": "Serve garnished with a bit of cilantro"}
        ]', 
        'vegan'),
        (
@@ -47,7 +47,6 @@ INSERT INTO measurement_units (measurement_description)
 VALUES ('cup'), ('grams'), ('tablespoon'), ('teaspoon'), ('pint'), 
        ('liter'), ('quart');
        
-
 INSERT INTO recipe_ingredients (recipe_id, measurement_id, ingredient_id, amount)
 VALUES (1, 1, 14, 2.0 ), (1, 1, 15, 1.0), (1, NULL, 16, 0.5), (1, 1, 17, 1.0), 
        (1, NULL, 18, 1.0), (1, NULL, 19, 1.0), (1, NULL, 20, 2.0), 

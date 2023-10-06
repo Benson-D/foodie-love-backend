@@ -59,5 +59,3 @@ CREATE TABLE users_groceries (
         REFERENCES ingredients ON DELETE CASCADE,
     PRIMARY KEY (user_id, ingredient_id)
 );
-
-

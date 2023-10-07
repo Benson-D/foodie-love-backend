@@ -1,5 +1,5 @@
 import db from "../configs/db";
-import { NotFoundError } from "../utils/expressError";
+import { BadRequestError, NotFoundError } from "../utils/expressError";
 import { sqlForPartialUpdate } from "../utils/sql";
 
 interface GetRecipe {
@@ -21,11 +21,8 @@ class RecipeModel {
   /**
    * Create a recipe then return new recipe data.
    *
-   * data should be { recipeName, prepTime, cookingTime, recipeImage,
-   * instructions, mealType }
-   *
    * @param {RecipeData} recipeData
-   * @return {Promise<{ id: number }>} JSON [{ id }]
+   * @return {Promise<{ id: number }>}
    */
   public static async insertRecipe(recipeData: {
     recipeName: string;
@@ -60,9 +57,6 @@ class RecipeModel {
 
   /**
    * Create an ingredient and returns new ingredient data.
-   *
-   * data should be { ingredientName }
-   *
    * If the ingredient already exists in the database, return that ingredient data.
    *
    * @param {string} ingredientName
@@ -71,15 +65,7 @@ class RecipeModel {
   public static async insertIngredients(
     ingredientName: string,
   ): Promise<{ id: number; ingredientName: string }> {
-    const checkIngredient = await db.query(
-      `SELECT id,
-				ingredient_name AS "ingredientName"
-				FROM ingredients
-				WHERE ingredient_name = $1`,
-      [ingredientName],
-    );
-
-    const existingIngredient = checkIngredient.rows[0];
+    const existingIngredient = this.findIngredient(ingredientName);
 
     if (existingIngredient) return existingIngredient;
 
@@ -136,8 +122,7 @@ class RecipeModel {
    * Create a recipe ingredient and returns new recipe ingredient data.
    *
    * @param {Object} recipeData
-   * @return {Promise<string>} JSON
-   *  [{ recipeId, measurementId, ingredientId, amount }]
+   * @return {Promise<Object>}
    */
   static async insertRecipeIngredients(recipeData: {
     recipeId: number;
@@ -222,8 +207,7 @@ class RecipeModel {
    * Find all recipes (optional filter on searchFilters).
    *
    * @param {Object} searchFilters
-   * @returns {Promise<string>} JSON
-   * [{ id, recipeName, cookingTime, recipeImage, mealType }]
+   * @returns {Promise<Array>}
    */
   public static async findAll(
     searchFilters: {
@@ -274,7 +258,7 @@ class RecipeModel {
    * @param {number} id
    * @returns {Promise<GetRecipe[]>}
    */
-  public static async getRecipe(id: number): Promise<GetRecipe[]> {
+  public static async findRecipeById(id: number): Promise<GetRecipe[]> {
     const response = await db.query(
       `SELECT rec.id,
                     rec.recipe_name AS "recipeName",
@@ -305,23 +289,36 @@ class RecipeModel {
   }
 
   /**
-   * Given a ingredient id, return data about ingredient.
-   *
-   * Throws NotFoundError if not found.
-   * @param {number} id
-   * @returns {Promise<{ ingredient: string }>}
-   */
-  public static async getIngredient(
-    id: number,
-  ): Promise<{ ingredient: string }> {
-    const result = await db.query(
-      `SELECT ingredient
-                FROM ingredients
-                WHERE id = $1`,
-      [id],
-    );
+   * Given a ingredient id or name, return data about ingredient.
 
-    if (!result) throw new NotFoundError(`No ingredient: ${id}`);
+   * @param {string | number} idOrIngredientName
+   * @returns {Promise<{ id: number; ingredientName: string }>}
+   */
+  public static async findIngredient(
+    idOrIngredientName: string | number,
+  ): Promise<{ id: number; ingredientName: string }> {
+    let whereClause = "";
+    let argument: string | number = "";
+
+    if (typeof idOrIngredientName === "number") {
+      whereClause = "id = $1";
+      argument = idOrIngredientName;
+    } else if (typeof idOrIngredientName === "string") {
+      whereClause = "ingredient = $1";
+      argument = idOrIngredientName;
+    } else {
+      throw new BadRequestError(
+        "Invalid parameter type. Please provide a number or string.",
+      );
+    }
+
+    const result = await db.query(
+      `SELECT id,
+              ingredient AS "ingredientName"
+                FROM ingredients
+                WHERE ${whereClause}`,
+      [argument],
+    );
 
     const ingredient = result.rows[0];
     return ingredient;
@@ -417,6 +414,56 @@ class RecipeModel {
     return recipeIngredient;
   }
 
+  /**
+   * Updates the recipe table and recipeIngredient table
+   * @param {number} recipeId
+   * @param {Object}data
+   * @returns
+   */
+  public static async updateRecipeWithIngredients(
+    recipeId: number,
+    data: {
+      recipeName: string;
+      prepTime?: number | undefined;
+      cookingTime?: number | undefined;
+      recipeImage: string;
+      mealType: string;
+      instructions: string;
+      ingredients?: {
+        amount: number;
+        measurementId?: number | undefined;
+        measurement?: string | undefined;
+        ingredientId: number;
+        ingredient: string;
+      }[];
+    },
+  ) {
+    // delete data?.ingredients;
+    const updatedRecipe = await this.updateRecipe(recipeId, data);
+
+    const ingredientList = data?.ingredients;
+    if (updatedRecipe && ingredientList && ingredientList.length) {
+      await Promise.all(
+        ingredientList.map(async (recipeList) => {
+          const response = await db.query(
+            `SELECT recipe_id,
+                          measurement_id,
+                          ingredient_id
+                  FROM recipe_ingredients
+                  WHERE recipe_id = $1 AND ingredient_id = $2`,
+            [recipeId, recipeList.ingredientId],
+          );
+
+          if (response) {
+            await this.updateRecipeIngredients(recipeId, recipeList);
+          }
+        }),
+      );
+    }
+
+    return data;
+  }
+
   /** Delete given recipe from database; returns undefined.
    *
    * Throws NotFoundError if recipe not found.
@@ -487,42 +534,6 @@ class RecipeModel {
 
     if (!recipeIngredient) throw new NotFoundError(`No recipeIngredient`);
   }
-
-  // static async handleUpdates(recipeId, data) {
-  //     const ingredientList = data?.ingredients;
-
-  //     delete data?.ingredients;
-
-  //     const updatedRecipe = await this.updateRecipe(recipeId, data);
-
-  //     if (updatedRecipe && ingredientList.length) {
-  //         await Promise.all(ingredientList.map( async (recipeList) => {
-
-  //             let updateWhere = '';
-  //             let values = [recipeId, recipeList.ingredientId];
-
-  //             if (recipeList?.measurementId) {
-  //                 updateWhere = ' AND measurement_id = $3';
-  //                 values.push(recipeList.measurementId);
-  //             }
-
-  //             const response = await db.query(
-  //                 `SELECT recipe_id,
-  //                         measurement_id,
-  //                         ingredient_id
-  //                 FROM recipe_ingredients
-  //                 WHERE recipe_id = $1 AND ingredient_id = $2 ${updateWhere}`,
-  //                 [...values]);
-
-  //             if (response) {
-  //                 await this.updateRecipeIngredients(recipeList, recipeId);
-  //             }
-
-  //         }));
-  //     }
-
-  //     return data;
-  // }
 }
 
 export default RecipeModel;

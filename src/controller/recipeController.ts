@@ -112,7 +112,7 @@ async function getAllRecipes(req: Request, res: Response) {
 async function getIndividualRecipe(req: Request, res: Response) {
   const recipeId = Number(req.params.id);
 
-  const recipe: GetRecipe[] = await RecipeModel.getRecipe(recipeId);
+  const recipe: GetRecipe[] = await RecipeModel.findRecipeById(recipeId);
   const formattedRecipe = _formatRecipe(recipe);
   return res.json({ recipe: formattedRecipe });
 }
@@ -129,10 +129,15 @@ async function uploadRecipeImage(req: Request, res: Response) {
   return res.status(201).json({ url: urlResponse || "" });
 }
 
-// async function recipeUpdate(req, res) {
-//     const recipe = await RecipeModel.handleUpdates(req.params.id, req.body);
-//     return res.json({ recipe });
-// }
+async function updateRecipe(req: Request, res: Response) {
+  const recipeId = Number(req.params.id);
+
+  const recipe = await RecipeModel.updateRecipeWithIngredients(
+    recipeId,
+    req.body,
+  );
+  return res.json({ recipe });
+}
 
 async function deleteRecipe(req: Request, res: Response) {
   const recipeId = Number(req.params.id);
@@ -260,6 +265,7 @@ export {
   getAllRecipes,
   getIndividualRecipe,
   createRecipe,
+  updateRecipe,
   uploadRecipeImage,
   deleteRecipe,
 };

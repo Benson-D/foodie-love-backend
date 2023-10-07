@@ -289,10 +289,10 @@ describe("findAll", function () {
     expect(recipes).toEqual([]);
   });
 });
-/******************************* getRecipe ************************************/
+/******************************* findRecipeById ************************************/
 describe("get recipe", function () {
   test("finds a recipe", async function () {
-    const recipe = await RecipeModel.getRecipe(recipeIds[0]);
+    const recipe = await RecipeModel.findRecipeById(recipeIds[0]);
 
     expect(recipe).toEqual([
       {
@@ -314,7 +314,7 @@ describe("get recipe", function () {
 
   test("not found if no such recipe", async function () {
     try {
-      await RecipeModel.getRecipe(9999);
+      await RecipeModel.findRecipeById(9999);
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
@@ -340,16 +340,13 @@ describe("update a curent recipe", function () {
       updateData,
     );
 
-    // const parsedInstructions = JSON.parse(updateRecipe.instructions);
-    // recipe[0].instructions = parsedInstructions;
-
     expect(updateRecipe).toEqual({
       id: recipeIds[0],
       recipeName: "update_recipe",
     });
 
     //Testing recipe updated properly
-    const recipe = await RecipeModel.getRecipe(recipeIds[0]);
+    const recipe = await RecipeModel.findRecipeById(recipeIds[0]);
     expect(recipe).toEqual([
       {
         id: recipeIds[0],

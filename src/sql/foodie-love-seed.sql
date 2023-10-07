@@ -13,11 +13,11 @@ VALUES (
        25, 
        NULL, 
        '[
-              {"description": "Heat 2 cups water and quinoa until boiling in medium saucepan over high heat, reduce heat to medium-low and simmer until water is absorbed and quinoa fluffs up, about 15 minutes. Quinoa is done when it is tender and there is a pop to each bite. Drain water and place quinoa in mixing bowl"}, 
-              {"description": "Add onion, broccoli, peppers, tomoatoes, and chickpeas"}, 
-              {"description": "To make the sauce, whisk together all the ingredients"}, 
-              {"description": "Add the sauce to the cooked quinoa and vegetables"}, 
-              {"description": "Serve garnished with a bit of cilantro"}
+              {"instruction": "Heat 2 cups water and quinoa until boiling in medium saucepan over high heat, reduce heat to medium-low and simmer until water is absorbed and quinoa fluffs up, about 15 minutes. Quinoa is done when it is tender and there is a pop to each bite. Drain water and place quinoa in mixing bowl"}, 
+              {"instruction": "Add onion, broccoli, peppers, tomoatoes, and chickpeas"}, 
+              {"instruction": "To make the sauce, whisk together all the ingredients"}, 
+              {"instruction": "Add the sauce to the cooked quinoa and vegetables"}, 
+              {"instruction": "Serve garnished with a bit of cilantro"}
        ]', 
        'vegan'),
        (
@@ -27,10 +27,10 @@ VALUES (
        NULL, 
        '
        [
-              {"description": "Preheat oven to 350°F"}, 
-              {"description": "Cut squash lengthwise and clean out seeds. Place squash cut sides down on a nonstick baking sheet. Bake for 45 minutes or until the squash is easily pierced with a sharp knife. Remove squash from oven and set aside to cool enough to be easily handled"},{"description": "While squash is baking, sauté onion and garlic with 2 tablespoons vegetable broth in a medium-sized skillet over medium heat until onion is soft. Add remaining vegetable broth, tomatoes, pepper, spices, and lemon juice. Cook for 5-8 minutes. Season with salt and pepper. Set aside."},
-              {"description": "Using a fork, gently pull the strands of squash away from the peel. Place the strands onto a large serving bowl"},
-              {"description": "Add tomato mixture to squash and mix gently. Serve warm"}
+              {"instruction": "Preheat oven to 350°F"}, 
+              {"instruction": "Cut squash lengthwise and clean out seeds. Place squash cut sides down on a nonstick baking sheet. Bake for 45 minutes or until the squash is easily pierced with a sharp knife. Remove squash from oven and set aside to cool enough to be easily handled"},{"instruction": "While squash is baking, sauté onion and garlic with 2 tablespoons vegetable broth in a medium-sized skillet over medium heat until onion is soft. Add remaining vegetable broth, tomatoes, pepper, spices, and lemon juice. Cook for 5-8 minutes. Season with salt and pepper. Set aside."},
+              {"instruction": "Using a fork, gently pull the strands of squash away from the peel. Place the strands onto a large serving bowl"},
+              {"instruction": "Add tomato mixture to squash and mix gently. Serve warm"}
        ]', 
        'vegan');
 

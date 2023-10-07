@@ -24,7 +24,7 @@ describe("create recipes", function () {
     prepTime: 15,
     cookingTime: 30,
     recipeImage: "http://new-recipe.img",
-    instructions: JSON.stringify([{ description: "testing, recipe_1" }]),
+    instructions: JSON.stringify([{ instruction: "testing, recipe_1" }]),
     mealType: "italian",
   };
 
@@ -302,7 +302,7 @@ describe("get recipe", function () {
         cookingTime: 10,
         recipeImage: null,
         mealType: "vegan",
-        instructions: [{ description: "testing, recipe_1" }],
+        instructions: [{ instruction: "testing, recipe_1" }],
         amount: "5",
         measurementId: measurementIds[0],
         measurement: "measurement_cup",
@@ -329,7 +329,7 @@ describe("update a curent recipe", function () {
     prepTime: 1,
     recipeImage: "",
     instructions: JSON.stringify([
-      { description: "adding test, update current recipe" },
+      { instruction: "adding test, update current recipe" },
     ]),
     mealType: "italian",
   };
@@ -358,7 +358,7 @@ describe("update a curent recipe", function () {
         cookingTime: 10,
         recipeImage: "",
         mealType: "italian",
-        instructions: [{ description: "adding test, update current recipe" }],
+        instructions: [{ instruction: "adding test, update current recipe" }],
         amount: "5",
         measurementId: measurementIds[0],
         measurement: "measurement_cup",

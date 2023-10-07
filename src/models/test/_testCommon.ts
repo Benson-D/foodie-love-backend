@@ -25,10 +25,10 @@ async function commonBeforeAll() {
                         recipe_image, 
                         instructions,  
                         meal_type)
-    VALUES ('recipe_1', 1, 10, NULL, '[{ "description": "testing, recipe_1"}]', 'vegan'),
-           ('recipe_2', 2, 20, NULL, '[{ "description": "testing, recipe_2"}]', 'italian'),
-           ('recipe_3', 3, 30, NULL, '[{ "description": "testing, recipe_3"}]', 'mexican'),
-           ('recipe_4', 4, 40, NULL, '[{ "description": "testing, recipe_4"}]', 'vegan')
+    VALUES ('recipe_1', 1, 10, NULL, '[{ "instruction": "testing, recipe_1"}]', 'vegan'),
+           ('recipe_2', 2, 20, NULL, '[{ "instruction": "testing, recipe_2"}]', 'italian'),
+           ('recipe_3', 3, 30, NULL, '[{ "instruction": "testing, recipe_3"}]', 'mexican'),
+           ('recipe_4', 4, 40, NULL, '[{ "instruction": "testing, recipe_4"}]', 'vegan')
     RETURNING id`);
 
   recipeIds.splice(0, 0, ...resultRecipe.rows.map((recipe) => recipe.id));

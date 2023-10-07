@@ -19,7 +19,7 @@ async function commonBeforeAll() {
     prepTime: 1,
     cookingTime: 10,
     instructions:
-      '[{"description": "this is a test recipe, this is testing routes 1"}]',
+      '[{"instruction": "this is a test recipe, this is testing routes 1"}]',
     recipeImage: "",
     mealType: "vegan",
   });
@@ -29,7 +29,7 @@ async function commonBeforeAll() {
     prepTime: 2,
     cookingTime: 20,
     instructions:
-      '[{"description": "this is a test recipe, this is testing routes 2"}]',
+      '[{"instruction": "this is a test recipe, this is testing routes 2"}]',
     recipeImage: "",
     mealType: "italian",
   });
@@ -38,7 +38,7 @@ async function commonBeforeAll() {
     prepTime: 3,
     cookingTime: 30,
     instructions:
-      '[{"description": "this is a test recipe, this is testing routes 3"}]',
+      '[{"instruction": "this is a test recipe, this is testing routes 3"}]',
     recipeImage: "",
     mealType: "mexican",
   });

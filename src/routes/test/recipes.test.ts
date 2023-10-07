@@ -20,7 +20,7 @@ describe("POST /recipes ", function () {
     prepTime: 1,
     cookingTime: 10,
     instructions:
-      '[{"description": "this is a test recipe, this is testing routes creation"}]',
+      '[{"instruction": "this is a test recipe, this is testing routes creation"}]',
     mealType: "vegan",
     ingredientList: JSON.stringify([]),
   };
@@ -30,7 +30,7 @@ describe("POST /recipes ", function () {
     prepTime: 1,
     cookingTime: 10,
     instructions:
-      '[{"description": "this is a test recipe, this is testing routes creation"}]',
+      '[{"instruction": "this is a test recipe, this is testing routes creation"}]',
     mealType: "vegan",
     ingredientList: JSON.stringify([
       {

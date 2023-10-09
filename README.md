@@ -9,6 +9,12 @@ The backend utilizes TypeScript, Node, Express, AWS, and PostgreSQL.
 
 **Backend Setup**
 
+- Clone repo locally:
+
+```console
+git clone https://github.com/Benson-D/foodie-love-backend.git
+```
+
 - `cd` into the project directory
 - `pnpm install` to install the dependencies needed for the application
 - Sets a pre commit hook for prettier to be used after every git commit

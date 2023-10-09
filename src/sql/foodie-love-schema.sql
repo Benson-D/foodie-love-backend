@@ -34,7 +34,7 @@ CREATE TABLE recipe_ingredients (
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid() UNIQUE,
     username VARCHAR(25), 
-    google_id INTEGER,
+    google_id TEXT UNIQUE,
     discord_id INTEGER,
     password TEXT,
     first_name TEXT NOT NULL,

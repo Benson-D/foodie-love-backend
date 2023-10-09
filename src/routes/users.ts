@@ -1,7 +1,7 @@
+import { Router, Request, Response } from "express";
 import UserModel from "../models/userModel";
-import { createToken } from "../utils/token";
-import { Router } from "express";
 import { isUserAuthenticated } from "../middleware/auth";
+import { createToken } from "../utils/token";
 
 const router: Router = Router();
 
@@ -12,6 +12,8 @@ const router: Router = Router();
  * { user: { username, firstName, lastName, email, isAdmin }, token }
  **/
 router.post("/", async function (req, res) {
+  console.log("this route is actually being called");
+
   const user = await UserModel.register(req.body);
   const token = createToken(user);
 
@@ -23,8 +25,10 @@ router.post("/", async function (req, res) {
  * Returns list of all users.
  **/
 router.get("/", async function (req, res, next) {
+  console.log("this route is actually being called");
+
   try {
-    const users = UserModel.findAll();
+    const users = await UserModel.findAll();
     return res.json({ users });
   } catch (err) {
     return next(err);
@@ -44,8 +48,8 @@ router.get("/:username", async function (req, res, next) {
   }
 });
 
-router.get("/auth", isUserAuthenticated, (req, res) => {
-  res.json(req.user);
+router.get("/auth/user", isUserAuthenticated, (req: Request, res: Response) => {
+  return res.json(req.user);
 });
 
 export default router;

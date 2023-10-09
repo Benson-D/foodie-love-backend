@@ -187,7 +187,7 @@ class UserModel {
               RETURNING google_id AS "googleId", 
                       first_name AS "firstName", 
                       last_name AS "lastName", 
-                      email, 
+                      email,
                       is_admin AS "isAdmin"`,
         [googleId, firstName, lastName, email, imageUrl, isAdmin ?? false],
       );

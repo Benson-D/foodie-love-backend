@@ -40,7 +40,7 @@ function ensureLoggedIn(res: Response, next: NextFunction) {
 
 function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
   if (!req.user) {
-    res.redirect("/auth/google");
+    res.status(401).send("You must login first!");
   } else {
     next();
   }

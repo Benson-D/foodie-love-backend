@@ -3,16 +3,6 @@ import passportGoogle from "passport-google-oauth20";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "./general";
 import UserModel from "../models/userModel";
 
-type UserDocument = {
-  username: string;
-  googleId: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  imageUrl: string;
-  isAdmin: boolean;
-};
-
 const GoogleStrategy = passportGoogle.Strategy;
 
 passport.use(
@@ -22,7 +12,7 @@ passport.use(
       clientSecret: GOOGLE_CLIENT_SECRET,
       callbackURL: "/auth/google/redirect",
     },
-    async (accessToken, refreshToken, profile, cb) => {
+    async (accessToken, refreshToken, profile, done) => {
       const defaultUser = {
         googleId: profile.id,
         firstName: profile.name?.givenName ?? "",
@@ -32,22 +22,18 @@ passport.use(
       };
 
       const userData = await UserModel.findOrCreate(profile.id, defaultUser);
-      console.log(userData, "data to store in db");
-      cb(null, userData);
+
+      done(null, userData);
     },
   ),
 );
 
-passport.serializeUser((user, cb) => {
-  console.log(user, "serialized user");
-  cb(null, user);
+passport.serializeUser((user, done) => {
+  done(null, user.googleId);
 });
 
-passport.deserializeUser(async (user: UserDocument, cb) => {
-  console.log(user, "deserialized user");
+passport.deserializeUser(async (id: string, done) => {
+  const user = await UserModel.findById(id);
 
-  const googleId = user.googleId as string;
-
-  const responseUser = await UserModel.findById(googleId);
-  cb(null, responseUser);
+  done(null, user);
 });

@@ -1,9 +1,9 @@
-import "./configs/passport";
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
 import cookieSession from "cookie-session";
 import passport from "passport";
+import "./configs/passport";
 import { NotFoundError, ExpressError } from "./utils/expressError";
 import recipeRoutes from "./routes/recipes";
 import userRoutes from "./routes/users";
@@ -21,10 +21,6 @@ app.use(
 app.use(express.json());
 app.use(morgan("tiny"));
 
-app.use("/recipes", recipeRoutes);
-app.use("/auth", authRoutes);
-app.use("/user", userRoutes);
-
 app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
@@ -35,6 +31,10 @@ app.use(
 // initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/recipes", recipeRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req: Request, res: Response, next: NextFunction) {

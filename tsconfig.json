@@ -12,12 +12,12 @@
     "sourceMap": true, // Generate source maps for debugging
     "isolatedModules": true, // Enable stricter module isolation
     "emitDecoratorMetadata": true, // Emit metadata for decorators
-    "esModuleInterop": true, // Enable ES module interoperability
-    "forceConsistentCasingInFileNames": true, // Enforce consistent file naming
     "strict": true,
+    "typeRoots": ["./src/typings", "./node_modules/@types"],
+    "esModuleInterop": true, // Enable ES module interoperability
     "skipLibCheck": true, // Skip type checking of declaration files
-    "typeRoots": ["./src/typings", "./node_modules/@types"]
+    "forceConsistentCasingInFileNames": true // Enforce consistent file naming
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["./src/**/*", "./src/typings/**/*.d.ts"],
+  "exclude": ["./node_modules"]
 }

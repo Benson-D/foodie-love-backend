@@ -12,8 +12,6 @@ const router: Router = Router();
  * { user: { username, firstName, lastName, email, isAdmin }, token }
  **/
 router.post("/", async function (req, res) {
-  console.log("this route is actually being called");
-
   const user = await UserModel.register(req.body);
   const token = createToken(user);
 
@@ -24,9 +22,7 @@ router.post("/", async function (req, res) {
  * GET / => { users: [ {username, firstName, lastName, email }, ... ] }
  * Returns list of all users.
  **/
-router.get("/", async function (req, res, next) {
-  console.log("this route is actually being called");
-
+router.get("/", isUserAuthenticated, async function (req, res, next) {
   try {
     const users = await UserModel.findAll();
     return res.json({ users });
@@ -39,7 +35,7 @@ router.get("/", async function (req, res, next) {
  * GET /[username] => { user }
  * Returns a single user and their data/
  **/
-router.get("/:username", async function (req, res, next) {
+router.get("/:username", isUserAuthenticated, async function (req, res, next) {
   try {
     const user = UserModel.get(req.params.username);
     return res.json({ user });

@@ -37,6 +37,9 @@ dependencies:
   passport-google-oauth20:
     specifier: ^2.0.0
     version: 2.0.0
+  passport-jwt:
+    specifier: ^4.0.1
+    version: 4.0.1
   pg:
     specifier: ^8.11.3
     version: 8.11.3
@@ -78,6 +81,9 @@ devDependencies:
   "@types/passport-google-oauth20":
     specifier: ^2.0.12
     version: 2.0.12
+  "@types/passport-jwt":
+    specifier: ^3.0.10
+    version: 3.0.10
   "@types/pg":
     specifier: ^8.10.2
     version: 8.10.2
@@ -1358,6 +1364,17 @@ packages:
       "@types/passport-oauth2": 1.4.13
     dev: true
 
+  /@types/passport-jwt@3.0.10:
+    resolution:
+      {
+        integrity: sha512-D2A911g2uiFsq/XXFBxQjcBcK4c6zPF2gAx9blEfz2AOXx5UUwsd8ZcMTcPe8z9dhW8LQBYLjv+vug2dvnRevA==,
+      }
+    dependencies:
+      "@types/express": 4.17.17
+      "@types/jsonwebtoken": 9.0.3
+      "@types/passport-strategy": 0.2.36
+    dev: true
+
   /@types/passport-oauth2@1.4.13:
     resolution:
       {
@@ -1366,6 +1383,16 @@ packages:
     dependencies:
       "@types/express": 4.17.17
       "@types/oauth": 0.9.2
+      "@types/passport": 1.0.13
+    dev: true
+
+  /@types/passport-strategy@0.2.36:
+    resolution:
+      {
+        integrity: sha512-hotVZuaCt04LJYXfZD5B+5UeCcRVG8IjKaLLGTJ1eFp0wiFQA2XfsqslGGInWje+OysNNLPH/ducce5GXHDC1Q==,
+      }
+    dependencies:
+      "@types/express": 4.17.17
       "@types/passport": 1.0.13
     dev: true
 
@@ -5285,6 +5312,16 @@ packages:
     engines: { node: ">= 0.4.0" }
     dependencies:
       passport-oauth2: 1.7.0
+    dev: false
+
+  /passport-jwt@4.0.1:
+    resolution:
+      {
+        integrity: sha512-UCKMDYhNuGOBE9/9Ycuoyh7vP6jpeTp/+sfMJl7nLff/t6dps+iaeE0hhNkKN8/HZHcJ7lCdOyDxHdDoxoSvdQ==,
+      }
+    dependencies:
+      jsonwebtoken: 9.0.2
+      passport-strategy: 1.0.0
     dev: false
 
   /passport-oauth2@1.7.0:

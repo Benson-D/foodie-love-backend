@@ -9,7 +9,7 @@ interface GetRecipe {
   cookingTime: string;
   recipeImage: string;
   mealType: string;
-  instructions: { description: string }[];
+  instructions: { instruction: string }[];
   amount: number;
   measurementId: number | undefined;
   measurement: string | undefined;
@@ -65,7 +65,7 @@ class RecipeModel {
   public static async insertIngredients(
     ingredientName: string,
   ): Promise<{ id: number; ingredientName: string }> {
-    const existingIngredient = this.findIngredient(ingredientName);
+    const existingIngredient = await this.findIngredient(ingredientName);
 
     if (existingIngredient) return existingIngredient;
 
@@ -137,11 +137,7 @@ class RecipeModel {
   }> {
     const { recipeId, measurementId, ingredientId, amount } = recipeData;
 
-    let recipeMeasurement: number | undefined;
-
-    if (measurementId) {
-      recipeMeasurement = measurementId;
-    }
+    const recipeMeasurement = measurementId && Number(measurementId);
 
     const result = await db.query(
       `INSERT INTO recipe_ingredients 
@@ -304,7 +300,7 @@ class RecipeModel {
       whereClause = "id = $1";
       argument = idOrIngredientName;
     } else if (typeof idOrIngredientName === "string") {
-      whereClause = "ingredient = $1";
+      whereClause = "ingredient_name = $1";
       argument = idOrIngredientName;
     } else {
       throw new BadRequestError(
@@ -314,7 +310,7 @@ class RecipeModel {
 
     const result = await db.query(
       `SELECT id,
-              ingredient AS "ingredientName"
+              ingredient_name AS "ingredientName"
                 FROM ingredients
                 WHERE ${whereClause}`,
       [argument],

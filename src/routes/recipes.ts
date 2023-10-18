@@ -1,26 +1,23 @@
 import { Router } from "express";
-import {
-  getAllRecipes,
-  getIndividualRecipe,
-  createRecipe,
-  updateRecipe,
-  uploadRecipeImage,
-  deleteRecipe,
-} from "../controller/recipeController";
+import RecipeController from "../controller/RecipeController";
 import multer from "multer";
 import { isUserAuthenticated } from "../middleware/auth";
 
 const upload = multer({ dest: "uploads/" });
 const router: Router = Router();
 
-router.get("/", isUserAuthenticated, getAllRecipes);
-router.get("/:id", getIndividualRecipe);
+router.get("/", isUserAuthenticated, RecipeController.getAllRecipes);
+router.get("/:id", isUserAuthenticated, RecipeController.getIndividualRecipe);
 
-router.post("/", isUserAuthenticated, createRecipe);
-router.post("/image", upload.single("recipeImage"), uploadRecipeImage);
+router.post("/", isUserAuthenticated, RecipeController.createRecipe);
+router.post(
+  "/image",
+  upload.single("recipeImage"),
+  RecipeController.uploadRecipeImage,
+);
 
-router.patch("/:id", isUserAuthenticated, updateRecipe);
+router.patch("/:id", isUserAuthenticated, RecipeController.updateRecipe);
 
-router.delete("/:id", isUserAuthenticated, deleteRecipe);
+router.delete("/:id", isUserAuthenticated, RecipeController.deleteRecipe);
 
 export default router;

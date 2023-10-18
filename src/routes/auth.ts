@@ -1,12 +1,12 @@
 import { Router, Request, Response } from "express";
-import jwt, { VerifyErrors } from "jsonwebtoken";
 import { createToken } from "../utils/token";
-import { REFRESH_TIME, SECRET_KEY } from "../configs/general";
+import { REFRESH_TIME } from "../configs/general";
 import { validate } from "jsonschema";
 import authToken from "../schemas/authToken.json";
 import authRegister from "../schemas/authRegister.json";
 import UserModel from "../models/userModel";
 import passport from "passport";
+import AuthController from "../controller/AuthController";
 
 const router: Router = Router();
 
@@ -24,8 +24,15 @@ router.post("/token", async function (req: Request, res: Response) {
 
   const { username, password } = req.body;
   const user = await UserModel.authenticate(username, password);
-  const token = createToken(user);
-  const refreshToken = createToken(user, REFRESH_TIME);
+
+  const initialUser = {
+    id: "",
+    username: user.username,
+    isAdmin: user.isAdmin,
+  };
+
+  const token = createToken(initialUser);
+  const refreshToken = createToken(initialUser, REFRESH_TIME);
 
   res.cookie("jwt", refreshToken, {
     maxAge: 24 * 60 * 60 * 1000,
@@ -52,8 +59,15 @@ router.post("/register", async function (req: Request, res: Response) {
   }
 
   const newUser = await UserModel.register({ ...requestBody, isAdmin: false });
-  const token = createToken(newUser);
-  const refreshToken = createToken(newUser, REFRESH_TIME);
+
+  const initialUser = {
+    id: "",
+    username: newUser.username,
+    isAdmin: false,
+  };
+
+  const token = createToken(initialUser);
+  const refreshToken = createToken(initialUser, REFRESH_TIME);
 
   res.cookie("jwt", refreshToken, {
     maxAge: 24 * 60 * 60 * 1000,
@@ -65,45 +79,25 @@ router.post("/register", async function (req: Request, res: Response) {
   return res.status(201).json({ message: "Register Successful!", token });
 });
 
-router.post("/refresh", async function (req: Request, res: Response) {
-  const { refreshToken } = req.cookies;
-
-  // Verify the refresh token
-  try {
-    jwt.verify(
-      refreshToken,
-      SECRET_KEY as string,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      async (err: VerifyErrors | null, decoded: any | undefined) => {
-        if (err || !decoded.username) {
-          return res.status(401).json({ errors: "Invalid refresh token" });
-        }
-
-        const user = await UserModel.get(decoded.username as string);
-        const token = createToken(user);
-        return res.status(201).json({ message: "New Token Acquired!", token });
-      },
-    );
-  } catch (err) {
-    return res.status(401).json({ errors: "Invalid refresh token" });
-  }
-});
+router.post("/refresh", AuthController.verifyRefreshToken);
 
 router.get(
   "/google",
-  passport.authenticate("google", { scope: ["email", "profile"] }),
+  passport.authenticate("google", {
+    accessType: "offline",
+    prompt: "consent",
+    scope: ["email", "profile"],
+  }),
 );
 
 router.get(
   "/google/redirect",
   passport.authenticate("google", {
     failureMessage: "Cannot login to Google, please try again later!",
-    failureRedirect: "http://localhost:5173/login/error",
-    successRedirect: "http://localhost:5173/login/success",
   }),
-  (req: Request, res: Response) => {
-    res.send("Thank you for signing in!");
-  },
+  AuthController.verifyGoogleOAuth2,
 );
+
+router.get("/logout", AuthController.userLogout);
 
 export default router;

@@ -3,7 +3,7 @@ import { SECRET_KEY, TOKEN_TIME } from "../configs/general";
 
 /** Return a signed JWT from user data. */
 function createToken(
-  user: { username: string; isAdmin?: boolean },
+  user: { id: string; username?: string; isAdmin?: boolean },
   time?: string,
 ) {
   console.assert(
@@ -12,6 +12,7 @@ function createToken(
   );
 
   const payload = {
+    id: user.id,
     username: user.username,
     isAdmin: user.isAdmin || false,
   };

@@ -21,6 +21,7 @@
   "dependencies": {
     "aws-sdk": "^2.1460.0",
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.6",
     "cookie-session": "^2.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/cookie-parser": "^1.4.5",
     "@types/cookie-session": "^2.0.45",
     "@types/cors": "^2.8.14",
     "@types/express": "^4.17.17",

@@ -1,16 +1,23 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
 import passport from "passport";
-import "./configs/passport";
+import "./configs/passportJWT";
+import "./configs/passportGoogleOAuth2";
 import { NotFoundError, ExpressError } from "./utils/expressError";
 import recipeRoutes from "./routes/recipes";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import { COOKIE_SECRET } from "./configs/general";
+import { authenticateJWTPassport } from "./middleware/auth";
 
 const app: Express = express();
+
+app.use(cookieParser());
+app.use(express.json());
+app.use(morgan("tiny"));
 
 app.use(
   cors({
@@ -18,8 +25,6 @@ app.use(
     credentials: true,
   }),
 );
-app.use(express.json());
-app.use(morgan("tiny"));
 
 app.use(
   cookieSession({
@@ -32,6 +37,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(authenticateJWTPassport);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/recipes", recipeRoutes);

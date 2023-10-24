@@ -1,0 +1,107 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Recipe {
+  id           String               @id @default(cuid())
+  name         String
+  prepTime     Int?
+  cookingTime  Int
+  recipeImage  String?
+  instructions Json
+  mealType     String?
+  createdAt    DateTime             @default(now())
+  createdBy    String
+  ingredients  RecipeIngredient[]
+  user         UserFavoriteRecipe[]
+}
+
+model Ingredient {
+  id          String             @id @default(cuid())
+  name        String
+  recipe      RecipeIngredient[]
+  userGrocery UserGrocery[]
+}
+
+model MeasurementUnit {
+  id          String             @id @default(cuid())
+  description String
+  recipe      RecipeIngredient[]
+}
+
+model RecipeIngredient {
+  recipeId          String
+  ingredientId      String
+  measurementUnitId String?
+  amount            Float?
+  recipe            Recipe           @relation(fields: [recipeId], references: [id])
+  ingredient        Ingredient       @relation(fields: [ingredientId], references: [id])
+  measurementUnit   MeasurementUnit? @relation(fields: [measurementUnitId], references: [id])
+
+  @@id([recipeId, ingredientId])
+  @@index([recipeId])
+  @@index([ingredientId])
+  @@index([measurementUnitId])
+}
+
+model User {
+  id                  String               @id @default(cuid())
+  googleId            String?              @unique
+  githubId            String?              @unique
+  discordId           String?              @unique
+  username            String?              @unique @db.VarChar(30)
+  password            String?
+  firstName           String
+  lastName            String
+  email               String               @unique
+  imageUrl            String?
+  role                Role                 @default(CLIENT)
+  createdAt           DateTime             @default(now())
+  UsersRecipes        UserFavoriteRecipe[]
+  UsersGroceries      UserGrocery[]
+  UserEmailPreference UserEmailPreference?
+}
+
+model UserFavoriteRecipe {
+  userId   String
+  recipeId String
+  user     User   @relation(fields: [userId], references: [id])
+  recipe   Recipe @relation(fields: [recipeId], references: [id])
+
+  @@id([userId, recipeId])
+  @@index([userId])
+  @@index([recipeId])
+}
+
+model UserGrocery {
+  userId String
+  itemId String
+  user   User       @relation(fields: [userId], references: [id])
+  item   Ingredient @relation(fields: [itemId], references: [id])
+
+  @@id([userId, itemId])
+  @@index([itemId])
+  @@index([userId])
+}
+
+model UserEmailPreference {
+  id           String  @id @default(cuid())
+  emailUpdates Boolean
+  user         User    @relation(fields: [userId], references: [id])
+  userId       String  @unique
+}
+
+enum Role {
+  CLIENT
+  ADMIN
+  DEVELOPER
+}

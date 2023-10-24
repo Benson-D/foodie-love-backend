@@ -11,7 +11,6 @@ import recipeRoutes from "./routes/recipes";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import { COOKIE_SECRET } from "./configs/general";
-import { authenticateJWTPassport } from "./middleware/auth";
 
 const app: Express = express();
 
@@ -37,7 +36,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(authenticateJWTPassport);
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/recipes", recipeRoutes);

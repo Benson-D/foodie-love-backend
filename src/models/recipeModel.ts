@@ -1,323 +1,201 @@
 import db from "../configs/db";
-import { BadRequestError, NotFoundError } from "../utils/expressError";
+import { prisma } from "../configs/prismaClient";
+import { NotFoundError } from "../utils/expressError";
 import { sqlForPartialUpdate } from "../utils/sql";
 
-interface GetRecipe {
-  id: number;
-  recipeName: string;
-  prepTime: string;
-  cookingTime: string;
-  recipeImage: string;
-  mealType: string;
-  instructions: { instruction: string }[];
-  amount: number;
-  measurementId: number | undefined;
-  measurement: string | undefined;
-  ingredientId: number;
-  ingredient: string;
-}
-
 class RecipeModel {
+  public static async findAll(
+    searchFilters: {
+      recipeName?: string;
+      cookingTime?: number;
+      mealType?: string;
+    } = {},
+    skip: number,
+  ) {
+    const { recipeName, cookingTime, mealType } = searchFilters;
+
+    const recipes = await prisma.recipe.findMany({
+      where: {
+        AND: [
+          recipeName ? { name: { contains: recipeName } } : {},
+          cookingTime ? { cookingTime: { lte: cookingTime } } : {},
+          mealType ? { mealType: mealType } : {},
+        ],
+      },
+      select: {
+        id: true,
+        name: true,
+        prepTime: true,
+        cookingTime: true,
+        recipeImage: true,
+        mealType: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+      skip: skip,
+      take: 10,
+    });
+
+    return recipes;
+  }
+
   /**
-   * Create a recipe then return new recipe data.
-   *
-   * @param {RecipeData} recipeData
-   * @return {Promise<{ id: number }>}
+   * Retrieves a recipe id and returns data with associated ingredients.
+   * @param recipeId
+   * @returns
    */
-  public static async insertRecipe(recipeData: {
+  public static async findRecipeById(recipeId: string) {
+    const foundRecipe = await prisma.recipe.findUnique({
+      where: { id: recipeId },
+      include: {
+        ingredients: {
+          select: {
+            ingredientId: true,
+            ingredient: {
+              select: {
+                name: true,
+              },
+            },
+            measurementUnitId: true,
+            measurementUnit: {
+              select: {
+                description: true,
+              },
+            },
+            amount: true,
+          },
+        },
+      },
+    });
+
+    if (!foundRecipe) throw new NotFoundError(`Recipe not found: ${recipeId}`);
+
+    return foundRecipe;
+  }
+
+  /**
+   * Retrieves first item in row that matches the ingredient parameter,
+   * if not found returns null.
+   * @param ingredientName
+   * @returns
+   */
+  public static async findIngredientByName(ingredientName: string) {
+    const foundIngredient = await prisma.ingredient.findFirst({
+      where: { name: ingredientName },
+    });
+    return foundIngredient;
+  }
+
+  /**
+   * Retrieves ingredient, if not found adds to the db and returns new ingredient.
+   * @param ingredientName
+   * @returns
+   */
+  public static async findOrCreateIngredient(ingredientName: string) {
+    const foundIngredient = await this.findIngredientByName(ingredientName);
+
+    if (foundIngredient) {
+      return foundIngredient;
+    }
+
+    const createIngredient = await prisma.ingredient.create({
+      data: {
+        name: ingredientName,
+      },
+    });
+
+    return createIngredient;
+  }
+
+  /**
+   * Retrieves measurement, if not found adds to the db and returns new measurement.
+   * @param measurement
+   * @returns
+   */
+  public static async findOrCreateMeasurement(measurement: string) {
+    const foundMeasurement = await prisma.measurementUnit.findFirst({
+      where: { description: measurement },
+    });
+
+    if (foundMeasurement) {
+      return foundMeasurement;
+    }
+
+    const createMeasurement = await prisma.measurementUnit.create({
+      data: {
+        description: measurement,
+      },
+    });
+
+    return createMeasurement;
+  }
+
+  /**
+   * Creates an individual recipe and adds to db
+   * @param recipeData
+   * @param userId
+   * @returns
+   */
+  public static async createRecipe(recipeData: {
     recipeName: string;
     prepTime?: number;
     cookingTime: number;
     recipeImage?: string;
     instructions: string;
     mealType?: string;
-  }): Promise<{ id: number }> {
-    const {
-      recipeName,
-      prepTime,
-      cookingTime,
-      recipeImage,
-      instructions,
-      mealType,
-    } = recipeData;
-
-    const result = await db.query(
-      `INSERT INTO recipes
-					(recipe_name, prep_time, cooking_time, recipe_image,
-					instructions, meal_type)
-					VALUES
-						($1, $2, $3, $4, $5, $6)
-					RETURNING id`,
-      [recipeName, prepTime, cookingTime, recipeImage, instructions, mealType],
-    );
-
-    const recipe = result.rows[0];
-    return recipe;
-  }
-
-  /**
-   * Create an ingredient and returns new ingredient data.
-   * If the ingredient already exists in the database, return that ingredient data.
-   *
-   * @param {string} ingredientName
-   * @return {Promise<{ id: number, ingredientName: string }>} JSON [{ id, ingredientName }]
-   */
-  public static async insertIngredients(
-    ingredientName: string,
-  ): Promise<{ id: number; ingredientName: string }> {
-    const existingIngredient = await this.findIngredient(ingredientName);
-
-    if (existingIngredient) return existingIngredient;
-
-    const result = await db.query(
-      `INSERT INTO ingredients (ingredient_name)
-				VALUES ($1)
-				RETURNING id, ingredient_name AS "ingredientName"`,
-      [ingredientName],
-    );
-
-    const ingredient = result.rows[0];
-
-    return ingredient;
-  }
-
-  /**
-   * Creates a measurement and returns new measurement data.
-   * If data already in database returns that measurement.
-   *
-   * @param {string | null} measurementDescription
-   * @return {Promise<{ id: number, measurementDescription: string } | undefined>}
-   * JSON [{ id, measurementDescription }]
-   */
-  public static async insertMeasurements(
-    measurementDescription: string | null,
-  ): Promise<{ id: number; measurement: string } | undefined> {
-    if (!measurementDescription) return;
-
-    const checkMeasurement = await db.query(
-      `SELECT id,
-						measurement_description AS "measurement"
-				FROM measurement_units
-				WHERE measurement_description = $1`,
-      [measurementDescription],
-    );
-
-    const duplicateMeasurement = checkMeasurement.rows[0];
-
-    if (duplicateMeasurement) return duplicateMeasurement;
-
-    const result = await db.query(
-      `INSERT INTO measurement_units (measurement_description)
-				 VALUES ($1)
-				 RETURNING id, measurement_description AS "measurement"`,
-      [measurementDescription],
-    );
-
-    const measurement = result.rows[0];
-
-    return measurement;
-  }
-
-  /**
-   * Create a recipe ingredient and returns new recipe ingredient data.
-   *
-   * @param {Object} recipeData
-   * @return {Promise<Object>}
-   */
-  static async insertRecipeIngredients(recipeData: {
-    recipeId: number;
-    measurementId?: number;
-    ingredientId: number;
-    amount: number;
-  }): Promise<{
-    recipeId: number;
-    measurementId?: number;
-    ingredientId: number;
-    amount: number;
-  }> {
-    const { recipeId, measurementId, ingredientId, amount } = recipeData;
-
-    const recipeMeasurement = measurementId && Number(measurementId);
-
-    const result = await db.query(
-      `INSERT INTO recipe_ingredients 
-				(recipe_id, measurement_id, ingredient_id, amount)
-			VALUES ($1, $2, $3, $4)
-			RETURNING recipe_id AS "recipeId", measurement_id AS "measurementId",
-			ingredient_id AS "ingredientId", amount`,
-      [recipeId, recipeMeasurement, ingredientId, amount],
-    );
-
-    const recipeIngredient = result.rows[0];
-
-    return recipeIngredient;
-  }
-
-  /**
-   * Create WHERE clause for filters, to be used by functions that query
-   * with filters.
-   *
-   * searchFilters (all optional):
-   * - recipeName (will find case-insensitive, partial matches)
-   * - cookingTime
-   * - mealType
-   *
-   * @param {Object} filterOptions
-   * @returns {Object}
-   * {  where: "WHERE cooking_time <= $1 AND (recipe_name ILIKE $2"
-   *    OR meal_type ILIKE $2),
-   *    vals: [25, '%Quinoa%']}
-   */
-  private static _filterWhereBuilder(filterOptions: {
-    recipeName?: string;
-    cookingTime?: number;
-    mealType?: string;
-  }): { whereClause: string; values: (string | number)[] } {
-    const whereParts: string[] = [];
-    const values: (string | number)[] = [];
-
-    if (filterOptions.recipeName !== undefined) {
-      values.push(`%${filterOptions.recipeName}%`);
-      whereParts.push(`
-				(recipe_name ILIKE $${values.length} OR meal_type ILIKE $${values.length})
-			`);
-    }
-
-    if (filterOptions.mealType !== undefined) {
-      values.push(filterOptions.mealType);
-      whereParts.push(`meal_type = $${values.length}`);
-    }
-
-    if (filterOptions.cookingTime !== undefined) {
-      values.push(filterOptions.cookingTime);
-      whereParts.push(`cooking_time <= $${values.length}`);
-    }
-
-    const whereClause =
-      whereParts.length > 0 ? `WHERE ${whereParts.join(" AND ")}` : "";
-
-    return { whereClause, values };
-  }
-
-  /**
-   * Find all recipes (optional filter on searchFilters).
-   *
-   * @param {Object} searchFilters
-   * @returns {Promise<Array>}
-   */
-  public static async findAll(
-    searchFilters: {
-      recipeName?: string;
-      cookingTime?: number;
-      mealType?: string;
-      skip?: number;
-    } = {},
-  ): Promise<
-    Array<{
-      id: number;
-      recipeName: string;
-      cookingTime: number;
-      recipeImage: string | null;
-      mealType: string;
-    }>
-  > {
-    const { recipeName, cookingTime, mealType, skip } = searchFilters;
-
-    const { whereClause, values } = this._filterWhereBuilder({
-      recipeName,
-      cookingTime,
-      mealType,
+    userId: string;
+  }) {
+    const createRecipe = await prisma.recipe.create({
+      data: {
+        name: recipeData.recipeName,
+        prepTime: recipeData.prepTime ?? null,
+        cookingTime: recipeData.cookingTime,
+        recipeImage: recipeData.recipeImage ?? null,
+        instructions: recipeData.instructions,
+        mealType: recipeData.mealType ?? null,
+        createdBy: recipeData.userId,
+      },
+      select: {
+        id: true,
+      },
     });
 
-    const recipesResponse = await db.query(
-      `SELECT id,
-				recipe_name AS "recipeName",
-				prep_time AS "prepTime",
-				cooking_time AS "cookingTime",
-				recipe_image AS "recipeImage",
-				meal_type AS "mealType"
-		FROM recipes ${whereClause}
-		ORDER BY id 
-		LIMIT 10
-		OFFSET $${values.length + 1}`,
-      [...values, skip],
-    );
-
-    return recipesResponse.rows;
+    return createRecipe;
   }
 
-  /**
-   * Given a recipe id, return data about recipe.
-   *
-   * Throws NotFoundError if not found.
-   *
-   * @param {number} id
-   * @returns {Promise<GetRecipe[]>}
-   */
-  public static async findRecipeById(id: number): Promise<GetRecipe[]> {
-    const response = await db.query(
-      `SELECT rec.id,
-                    rec.recipe_name AS "recipeName",
-                    rec.prep_time AS "prepTime",
-                    rec.cooking_time AS "cookingTime",
-                    rec.recipe_image AS "recipeImage",
-                    rec.meal_type AS "mealType",
-                    rec.instructions,
-                    ri.amount,
-                    mu.id AS "measurementId",
-                    mu.measurement_description AS "measurement",
-                    ingredients.id AS "ingredientId",
-                    ingredients.ingredient_name AS "ingredient"
-            FROM recipes rec
-                INNER JOIN 
-                    recipe_ingredients ri ON rec.id = ri.recipe_id
-                INNER JOIN 
-                    ingredients ON ingredients.id = ri.ingredient_id
-                LEFT JOIN 
-                    measurement_units mu ON mu.id = ri.measurement_id
-            WHERE rec.id = $1`,
-      [id],
-    );
+  public static async createRecipeIngredient(recipeData: {
+    recipeId: string;
+    measurementId?: string;
+    ingredientId: string;
+    amount: number;
+  }) {
+    const createdRecipeIngredient = await prisma.recipeIngredient.create({
+      data: {
+        recipeId: recipeData.recipeId,
+        ingredientId: recipeData.ingredientId,
+        measurementUnitId: recipeData.measurementId ?? null,
+        amount: recipeData.amount,
+      },
+    });
 
-    if (!response.rows.length) throw new NotFoundError(`No recipe: ${id}`);
-
-    return response.rows;
+    return createdRecipeIngredient;
   }
 
-  /**
-   * Given a ingredient id or name, return data about ingredient.
+  public static async removeRecipe(recipeId: string) {
+    const deletedRecipe = await prisma.recipe.delete({
+      where: {
+        id: recipeId,
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
 
-   * @param {string | number} idOrIngredientName
-   * @returns {Promise<{ id: number; ingredientName: string }>}
-   */
-  public static async findIngredient(
-    idOrIngredientName: string | number,
-  ): Promise<{ id: number; ingredientName: string }> {
-    let whereClause = "";
-    let argument: string | number = "";
+    if (!deletedRecipe) throw new NotFoundError(`No recipe: ${recipeId}`);
 
-    if (typeof idOrIngredientName === "number") {
-      whereClause = "id = $1";
-      argument = idOrIngredientName;
-    } else if (typeof idOrIngredientName === "string") {
-      whereClause = "ingredient_name = $1";
-      argument = idOrIngredientName;
-    } else {
-      throw new BadRequestError(
-        "Invalid parameter type. Please provide a number or string.",
-      );
-    }
-
-    const result = await db.query(
-      `SELECT id,
-              ingredient_name AS "ingredientName"
-                FROM ingredients
-                WHERE ${whereClause}`,
-      [argument],
-    );
-
-    const ingredient = result.rows[0];
-    return ingredient;
+    return deletedRecipe;
   }
 
   /**
@@ -458,45 +336,6 @@ class RecipeModel {
     }
 
     return data;
-  }
-
-  /** Delete given recipe from database; returns undefined.
-   *
-   * Throws NotFoundError if recipe not found.
-   * @param {Number} id
-   * @return {Promise<string>} JSON
-   */
-  public static async removeRecipe(id: number): Promise<void> {
-    const result = await db.query(
-      `DELETE
-             FROM recipes
-             WHERE id = $1
-             RETURNING id`,
-      [id],
-    );
-
-    const recipe = result.rows[0];
-
-    if (!recipe) throw new NotFoundError(`No recipe: ${id}`);
-  }
-
-  /** Delete given ingredient from database; returns undefined.
-   *
-   * Throws NotFoundError if ingredient not found.
-   * @param {Number} id
-   */
-  public static async removeIngredient(id: number): Promise<void> {
-    const result = await db.query(
-      `DELETE
-             FROM ingredients
-             WHERE id = $1
-             RETURNING id`,
-      [id],
-    );
-
-    const ingredient = result.rows[0];
-
-    if (!ingredient) throw new NotFoundError(`No ingredient: ${id}`);
   }
 
   /** Delete given ingredient from database; returns undefined.

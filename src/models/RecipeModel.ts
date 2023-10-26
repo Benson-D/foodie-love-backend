@@ -1,7 +1,5 @@
-import db from "../configs/db";
 import { prisma } from "../configs/prismaClient";
 import { NotFoundError } from "../utils/expressError";
-import { sqlForPartialUpdate } from "../utils/sql";
 
 class RecipeModel {
   public static async findAll(
@@ -182,6 +180,93 @@ class RecipeModel {
     return createdRecipeIngredient;
   }
 
+  public static async updateRecipe(
+    recipeId: string,
+    recipeData: {
+      recipeName: string;
+      prepTime?: number;
+      cookingTime: number;
+      recipeImage?: string;
+      mealType?: string;
+      instructions: string;
+    },
+  ) {
+    const updatedRecipe = await prisma.recipe.update({
+      where: {
+        id: recipeId,
+      },
+      data: {
+        name: recipeData.recipeName,
+        prepTime: recipeData.prepTime ?? null,
+        cookingTime: recipeData.cookingTime,
+        recipeImage: recipeData.recipeImage ?? null,
+        mealType: recipeData.mealType ?? null,
+      },
+    });
+
+    return updatedRecipe;
+  }
+
+  public static async updateRecipeIngredient(
+    recipeId: string,
+    updateRecipeIngredient: {
+      amount: number;
+      measurementId?: string;
+      ingredientId: string;
+    },
+  ) {
+    const updatedRecipeIngredient = await prisma.recipeIngredient.update({
+      where: {
+        recipeId_ingredientId: {
+          recipeId: recipeId,
+          ingredientId: updateRecipeIngredient.ingredientId,
+        },
+      },
+      data: {
+        amount: updateRecipeIngredient.amount,
+        measurementUnitId: updateRecipeIngredient.measurementId ?? null,
+        ingredientId: updateRecipeIngredient.ingredientId,
+      },
+    });
+
+    return updatedRecipeIngredient;
+  }
+
+  /**
+   * Updates the recipe table and recipeIngredient table
+   * @param {number} recipeId
+   * @param {Object} recipeData
+   * @returns
+   */
+  public static async updateRecipeWithIngredients(
+    recipeId: string,
+    recipeData: {
+      recipeName: string;
+      prepTime?: number;
+      cookingTime: number;
+      recipeImage?: string;
+      mealType?: string;
+      instructions: string;
+      ingredients: {
+        amount: number;
+        measurementId?: string;
+        ingredientId: string;
+      }[];
+    },
+  ) {
+    const foundRecipe = await this.findRecipeById(recipeId);
+
+    if (!foundRecipe) throw new NotFoundError(`Recipe not found: ${recipeId}`);
+
+    const updatedRecipe = await this.updateRecipe(recipeId, recipeData);
+
+    for (const ingredientItems of recipeData.ingredients) {
+      await this.updateRecipeIngredient(recipeId, ingredientItems);
+    }
+
+    return updatedRecipe;
+  }
+
   public static async removeRecipe(recipeId: string) {
     const deletedRecipe = await prisma.recipe.delete({
       where: {
@@ -198,176 +283,20 @@ class RecipeModel {
     return deletedRecipe;
   }
 
-  /**
-   * Update current recipe list based on data
-   *
-   * Partial Update -- data doesn't need all fields
-   * Throws NotFoundError if recipe id not found.
-   *
-   * @param {Number} id
-   * @param {Object} data
-   * @returns
-   */
-  public static async updateRecipe(
-    id: number,
-    data: {
-      recipeName: string;
-      prepTime?: number;
-      cookingTime?: number;
-      recipeImage: string;
-      mealType: string;
-      instructions: string;
-    },
-  ): Promise<{ id: number; recipeName: string }> {
-    const columnsToSql = {
-      recipeName: "recipe_name",
-      cookingTime: "cooking_time",
-      prepTime: "prep_time",
-      recipeImage: "recipe_image",
-      mealType: "meal_type",
-    };
+  public static async removeRecipeIngredients(recipeData: {
+    recipeId: string;
+    ingredientId: string;
+  }) {
+    const deletedRecipeIngredient = await prisma.recipeIngredient.delete({
+      where: {
+        recipeId_ingredientId: {
+          recipeId: recipeData.recipeId,
+          ingredientId: recipeData.ingredientId,
+        },
+      },
+    });
 
-    const { setCols, values } = sqlForPartialUpdate(data, columnsToSql);
-    const result = await db.query(
-      `UPDATE recipes
-             SET ${setCols}
-             WHERE id = $${values.length + 1}
-             RETURNING id, recipe_name AS "recipeName"`,
-      [...values, id],
-    );
-
-    const recipe = result.rows[0];
-
-    if (!recipe) throw new NotFoundError(`No recipe: ${id}`);
-
-    return recipe;
-  }
-
-  /**
-   * Upate recipe Ingredient List
-   *
-   * Partial Update -- data doesn't need all fields
-   * Throws NotFoundError if recipe list id not found.
-   * @param {*} id
-   * @param {*} data
-   * @returns
-   */
-  public static async updateRecipeIngredients(
-    id: number,
-    data: {
-      amount: number;
-      measurementId?: number;
-      measurement?: string;
-      ingredientId: number;
-      ingredient: string;
-    },
-  ) {
-    const columnsToSql = {
-      recipeId: "recipe_id",
-      measurementId: "measurement_id",
-      ingredientId: "ingredient_id",
-    };
-
-    const { setCols, values } = sqlForPartialUpdate(data, columnsToSql);
-
-    const result = await db.query(
-      `UPDATE recipe_ingredients 
-             SET ${setCols}
-             WHERE recipe_id = $${values.length + 1}
-             RETURNING recipe_id AS "recipeId", 
-                    measurement_id AS "measurementId",
-                    ingredient_id AS "ingredientId", 
-                    amount`,
-      [...values, id],
-    );
-
-    const recipeIngredient = result.rows[0];
-
-    if (!recipeIngredient) throw new NotFoundError(`No recipe: ${id}`);
-
-    return recipeIngredient;
-  }
-
-  /**
-   * Updates the recipe table and recipeIngredient table
-   * @param {number} recipeId
-   * @param {Object}data
-   * @returns
-   */
-  public static async updateRecipeWithIngredients(
-    recipeId: number,
-    data: {
-      recipeName: string;
-      prepTime?: number | undefined;
-      cookingTime?: number | undefined;
-      recipeImage: string;
-      mealType: string;
-      instructions: string;
-      ingredients?: {
-        amount: number;
-        measurementId?: number | undefined;
-        measurement?: string | undefined;
-        ingredientId: number;
-        ingredient: string;
-      }[];
-    },
-  ) {
-    // delete data?.ingredients;
-    const updatedRecipe = await this.updateRecipe(recipeId, data);
-
-    const ingredientList = data?.ingredients;
-    if (updatedRecipe && ingredientList && ingredientList.length) {
-      await Promise.all(
-        ingredientList.map(async (recipeList) => {
-          const response = await db.query(
-            `SELECT recipe_id,
-                          measurement_id,
-                          ingredient_id
-                  FROM recipe_ingredients
-                  WHERE recipe_id = $1 AND ingredient_id = $2`,
-            [recipeId, recipeList.ingredientId],
-          );
-
-          if (response) {
-            await this.updateRecipeIngredients(recipeId, recipeList);
-          }
-        }),
-      );
-    }
-
-    return data;
-  }
-
-  /** Delete given ingredient from database; returns undefined.
-   *
-   * Throws NotFoundError if ingredient not found.
-   * @param {Object} data
-   */
-  public static async removeRecipeIngredients(data: {
-    recipeId: number;
-    measurementId?: number;
-    ingredientId: number;
-  }): Promise<void> {
-    const columnsToSql = {
-      recipeId: "recipe_id",
-      measurementId: "measurement_id",
-      ingredientId: "ingredient_id",
-    };
-
-    const { setCols, values } = sqlForPartialUpdate(data, columnsToSql);
-    const deleteCols = setCols.split(",");
-
-    const result = await db.query(
-      `DELETE
-             FROM recipe_ingredients
-             WHERE ${deleteCols.join(" AND ")}
-             RETURNING recipe_id`,
-      [...values],
-    );
-
-    const recipeIngredient = result.rows[0];
-
-    if (!recipeIngredient) throw new NotFoundError(`No recipeIngredient`);
+    return deletedRecipeIngredient;
   }
 }
 

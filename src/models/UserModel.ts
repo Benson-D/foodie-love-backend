@@ -1,5 +1,5 @@
-import { NotFoundError } from "../utils/expressError";
 import { prisma } from "../configs/prismaClient";
+import { NotFoundError } from "../utils/expressError";
 
 class UserModel {
   private static userGeneralSelect = {

@@ -1,11 +1,11 @@
 export type UserDocument = {
-  username: string;
-  googleId: string;
+  id: string;
+  username: string | null;
   firstName: string;
   lastName: string;
   email: string;
-  imageUrl: string;
-  isAdmin: boolean;
+  imageUrl: string | null;
+  role: string;
 };
 
 declare global {

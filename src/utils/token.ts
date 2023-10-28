@@ -3,22 +3,17 @@ import { SECRET_KEY, TOKEN_TIME } from "../configs/general";
 
 /** Return a signed JWT from user data. */
 function createToken(
-  user: { id: string; username?: string; isAdmin?: boolean },
+  user: { id: string; username: string | null; role?: string },
   time?: string,
 ) {
-  console.assert(
-    user.isAdmin !== undefined,
-    "createToken passed user without isAdmin property",
-  );
-
   const payload = {
     id: user.id,
     username: user.username,
-    isAdmin: user.isAdmin || false,
+    role: user.role || "CLIENT",
   };
 
-  return jwt.sign(payload, SECRET_KEY as string, {
-    expiresIn: !time ? (TOKEN_TIME as string) : time,
+  return jwt.sign(payload, SECRET_KEY, {
+    expiresIn: !time ? TOKEN_TIME : time,
   });
 }
 

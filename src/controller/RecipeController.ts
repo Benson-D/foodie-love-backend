@@ -2,60 +2,26 @@ import { Request, Response } from "express";
 import { validate } from "jsonschema";
 import * as recipeSearchSchema from "../schemas/recipeSearch.json";
 import * as recipeNewSchema from "../schemas/recipeNew.json";
-import RecipeModel from "../models/recipeModel";
-import { BadRequestError } from "../utils/expressError";
+import RecipeModel from "../models/RecipeModel";
 import { uploadImageToS3 } from "../aws/s3";
 import { unlink } from "fs/promises";
 
-interface IngredientItems {
-  amount: number;
-  measurementId: number | undefined;
-  measurement: string | undefined;
-  ingredientId: number;
-  ingredient: string;
-}
-
-interface GetRecipe {
-  id: number;
-  recipeName: string;
-  prepTime: string;
-  cookingTime: string;
-  recipeImage: string;
-  mealType: string;
-  instructions: { instruction: string }[];
-  amount: number;
-  measurementId: number | undefined;
-  measurement: string | undefined;
-  ingredientId: number;
-  ingredient: string;
-}
-
-interface FormattedRecipe {
-  id: number;
-  recipeName: string;
-  prepTime: string;
-  cookingTime: string;
-  recipeImage: string | undefined;
-  mealType: string;
-  instructions: { instruction: string }[];
-  ingredients: IngredientItems[];
-}
-
 export default class RecipeController {
+  /**
+   * Validates and retrieves all or filtered recipes
+   * @param req
+   * @param res
+   * @returns
+   */
   public static async getAllRecipes(req: Request, res: Response) {
     const recipeQuery = req.query as Record<string, string | number>;
 
-    if (recipeQuery?.skip) {
-      recipeQuery.skip = Number(recipeQuery.skip);
-    } else {
-      recipeQuery["skip"] = 0;
-    }
+    recipeQuery.skip = Number(recipeQuery.skip) || 0;
 
     if (recipeQuery?.cookingTime) {
       recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
     }
 
-    // Validate the query parameters against a predefined schema.
     const validator = validate(recipeQuery, recipeSearchSchema);
 
     if (!validator.valid) {
@@ -64,7 +30,12 @@ export default class RecipeController {
     }
 
     try {
-      const recipes = await RecipeModel.findAll(recipeQuery);
+      const userId = req.user?.id ? req.user.id : "0";
+      const recipes = await RecipeModel.findAll(
+        recipeQuery,
+        userId,
+        Number(recipeQuery.skip),
+      );
       return res.json({ recipes });
     } catch (error) {
       return res.status(500).json({ error: "Internal Server Error" });
@@ -72,53 +43,19 @@ export default class RecipeController {
   }
 
   public static async getIndividualRecipe(req: Request, res: Response) {
-    const recipeId = Number(req.params.id);
+    const recipeId = req.params.id;
+    const foundRecipe = await RecipeModel.findRecipeById(recipeId);
 
-    const recipe: GetRecipe[] = await RecipeModel.findRecipeById(recipeId);
-    const formattedRecipe = this._formatIndividualRecipe(recipe);
-    return res.json({ recipe: formattedRecipe });
+    return res.json({ recipe: foundRecipe });
   }
 
-  private static _formatIndividualRecipe(recipe: GetRecipe[]): FormattedRecipe {
-    const initialRecipeContainer: FormattedRecipe = {
-      id: 0,
-      recipeName: "",
-      prepTime: "",
-      cookingTime: "",
-      recipeImage: "",
-      mealType: "",
-      instructions: [],
-      ingredients: [],
-    };
-
-    const formattedSingleRecipe = recipe.reduce((output, item) => {
-      const minuteStatement = Number(item.prepTime) > 1 ? "minutes" : "minute";
-
-      output.id = item.id;
-      output.recipeName = item.recipeName;
-      output.prepTime = `${item.prepTime} ${minuteStatement}`;
-      output.cookingTime = `${item.cookingTime} minutes`;
-      output.recipeImage = item?.recipeImage;
-      output.mealType = item.mealType;
-      output.instructions = item.instructions;
-
-      const ingredientList: IngredientItems = {
-        amount: item.amount,
-        measurementId: item?.measurementId,
-        measurement: item?.measurement,
-        ingredientId: item.ingredientId,
-        ingredient: item.ingredient,
-      };
-
-      output.ingredients.push(ingredientList);
-
-      return output;
-    }, initialRecipeContainer);
-
-    return formattedSingleRecipe;
-  }
-
-  public static async createRecipe(req: Request, res: Response) {
+  /**
+   * Validates and creates a recipe and recipe ingredients to the db.
+   * @param req
+   * @param res
+   * @returns
+   */
+  public static async createRecipeAndIngredients(req: Request, res: Response) {
     const validator = validate(req.body, recipeNewSchema);
 
     if (!validator.valid) {
@@ -127,29 +64,42 @@ export default class RecipeController {
       return res.status(400).json({ errors: errs });
     }
 
-    const recipe = await RecipeModel.insertRecipe(req.body);
+    try {
+      const recipe = await RecipeModel.createRecipe(req.body);
 
-    const { ingredientList } = req.body;
-    const recipeIngredients = JSON.parse(ingredientList);
+      const { ingredientList } = req.body;
+      const recipeIngredients = JSON.parse(ingredientList);
 
-    const responseIngredients = await Promise.all(
-      recipeIngredients.map(
-        async (list: {
-          amount: string;
-          measurement: string;
-          ingredient: string;
-        }) => await _ingredientBuilder(recipe.id, list),
-      ),
-    );
+      const responseIngredients = await Promise.all(
+        recipeIngredients.map(
+          async (list: {
+            amount: string;
+            measurement: string;
+            ingredient: string;
+          }) => await _ingredientBuilder(recipe.id, list),
+        ),
+      );
 
-    const output = {
-      id: recipe.id,
-      ingredients: [...responseIngredients],
-    };
+      const output = {
+        id: recipe.id,
+        ingredients: [...responseIngredients],
+      };
 
-    return res.status(201).json({ recipe: output });
+      return res.status(201).json({ recipe: output });
+    } catch (err) {
+      console.error("An error occurred:", err);
+      return res
+        .status(500)
+        .json({ err: "An error occurred while creating the recipe." });
+    }
   }
 
+  /**
+   * Uploads an image to s3 bucket returns url if valid image.
+   * @param req
+   * @param res
+   * @returns
+   */
   public static async uploadRecipeImage(req: Request, res: Response) {
     const image = req.file || "";
     let urlResponse = "";
@@ -163,7 +113,7 @@ export default class RecipeController {
   }
 
   public static async updateRecipe(req: Request, res: Response) {
-    const recipeId = Number(req.params.id);
+    const recipeId = req.params.id;
 
     const recipe = await RecipeModel.updateRecipeWithIngredients(
       recipeId,
@@ -173,32 +123,21 @@ export default class RecipeController {
   }
 
   public static async deleteRecipe(req: Request, res: Response) {
-    const recipeId = Number(req.params.id);
-
-    await RecipeModel.removeRecipe(recipeId);
-    return res.json({ deleted: req.params.id });
+    const deletedRecipe = await RecipeModel.removeRecipe(req.params.id);
+    return res.json({ deleted: deletedRecipe });
   }
 }
 
 /******************************* Helpers **************************************/
 
 async function _ingredientBuilder(
-  recipeId: number,
+  recipeId: string,
   recipeItems: { amount: string; measurement: string; ingredient: string },
-): Promise<{
-  recipeId: number;
-  measurementId?: number | undefined;
-  ingredientId: number;
-  amount: number;
-}> {
-  if (typeof recipeId !== "number") {
-    throw new BadRequestError("Not a valid id");
-  }
-
+) {
   const { amount, measurement, ingredient } = recipeItems;
 
-  const measurementId = await insertMeasurement(measurement);
-  const ingredientId = await insertIngredient(ingredient);
+  const measurementId = await insertMeasurementAndReturnId(measurement);
+  const ingredientId = await insertIngredientAndReturnId(ingredient);
   const parsedAmount = parseRecipeAmount(amount);
 
   const recipeData = {
@@ -208,7 +147,7 @@ async function _ingredientBuilder(
     amount: parsedAmount,
   };
 
-  const result = await RecipeModel.insertRecipeIngredients(recipeData);
+  const result = await RecipeModel.createRecipeIngredient(recipeData);
   return result;
 }
 
@@ -226,14 +165,16 @@ function parseRecipeAmount(amount: string): number {
   return parseFloat(parsedAmount);
 }
 
-async function insertIngredient(ingredient: string): Promise<number> {
-  const response = await RecipeModel.insertIngredients(ingredient);
+async function insertIngredientAndReturnId(
+  ingredient: string,
+): Promise<string> {
+  const response = await RecipeModel.findOrCreateIngredient(ingredient);
   return response.id;
 }
 
-async function insertMeasurement(
+async function insertMeasurementAndReturnId(
   measurement: string,
-): Promise<number | undefined> {
-  const response = await RecipeModel.insertMeasurements(measurement);
+): Promise<string | undefined> {
+  const response = await RecipeModel.findOrCreateMeasurement(measurement);
   return response?.id ?? undefined;
 }

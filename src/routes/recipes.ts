@@ -9,7 +9,11 @@ const router: Router = Router();
 router.get("/", isUserAuthenticated, RecipeController.getAllRecipes);
 router.get("/:id", isUserAuthenticated, RecipeController.getIndividualRecipe);
 
-router.post("/", isUserAuthenticated, RecipeController.createRecipe);
+router.post(
+  "/",
+  isUserAuthenticated,
+  RecipeController.createRecipeAndIngredients,
+);
 router.post(
   "/image",
   upload.single("recipeImage"),

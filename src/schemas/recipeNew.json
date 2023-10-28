@@ -23,6 +23,9 @@
     },
     "ingredientList": {
       "type": "string"
+    },
+    "userId": {
+      "type": "string"
     }
   },
   "additionalProperties": false,

@@ -7,7 +7,8 @@ class RecipeModel {
       recipeName?: string;
       cookingTime?: number;
       mealType?: string;
-    } = {},
+    },
+    userId: string,
     skip: number,
   ) {
     const { recipeName, cookingTime, mealType } = searchFilters;
@@ -27,6 +28,14 @@ class RecipeModel {
         cookingTime: true,
         recipeImage: true,
         mealType: true,
+        user: {
+          select: {
+            userId: true,
+          },
+          where: {
+            userId: userId,
+          },
+        },
       },
       orderBy: {
         id: "asc",

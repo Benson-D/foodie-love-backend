@@ -76,6 +76,19 @@ class UserModel {
     return createGoogleUser;
   }
 
+  public static async findFavoriteRecipe(id: string, recipeId: string) {
+    const findFavoriteRecipe = await prisma.userFavoriteRecipe.findUnique({
+      where: {
+        userId_recipeId: {
+          userId: id,
+          recipeId: recipeId,
+        },
+      },
+    });
+
+    return findFavoriteRecipe;
+  }
+
   /**
    * Adds a users favorite recipe to `UserFavoriteRecipe` table
    * @param id
@@ -88,8 +101,7 @@ class UserModel {
       where: { id: recipeId },
     });
 
-    if (!foundUserId)
-      throw new NotFoundError(`No user with found with id: ${id}`);
+    if (!foundUserId) throw new NotFoundError(`No user with id: ${id}`);
     if (!foundRecipe) throw new NotFoundError(`No recipe with id: ${recipeId}`);
 
     const addFavorite = await prisma.userFavoriteRecipe.create({
@@ -100,6 +112,27 @@ class UserModel {
     });
 
     return addFavorite;
+  }
+
+  public static async deleteFavoriteRecipe(id: string, recipeId: string) {
+    const foundUserId = await this.findById(id);
+    const foundRecipe = await prisma.recipe.findUnique({
+      where: { id: recipeId },
+    });
+
+    if (!foundUserId) throw new NotFoundError(`No user with id: ${id}`);
+    if (!foundRecipe) throw new NotFoundError(`No recipe with id: ${recipeId}`);
+
+    const deleteFavorite = await prisma.userFavoriteRecipe.delete({
+      where: {
+        userId_recipeId: {
+          userId: id,
+          recipeId: recipeId,
+        },
+      },
+    });
+
+    return deleteFavorite;
   }
 
   /**
@@ -114,8 +147,7 @@ class UserModel {
       where: { id: ingredientId },
     });
 
-    if (!foundUserId)
-      throw new NotFoundError(`No user with found with id: ${id}`);
+    if (!foundUserId) throw new NotFoundError(`No user with id: ${id}`);
     if (!foundRecipe)
       throw new NotFoundError(`No ingredient with id: ${ingredientId}`);
 

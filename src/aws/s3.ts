@@ -1,13 +1,21 @@
 import dotenv from "dotenv";
 import AWS from "aws-sdk";
 import fs from "fs";
+import {
+  AWS_ACCESS_KEY_ID,
+  AWS_BUCKET_REGION,
+  AWS_SECRET_ACCESS_KEY,
+} from "../configs/general";
 
 dotenv.config();
 
-const bucketName: string = process.env?.BUCKET ? process.env.BUCKET : "";
-const region = process.env.BUCKET_REGION;
+const bucketName: string = process.env.BUCKET as string;
 
-AWS.config.update({ region });
+AWS.config.update({
+  region: AWS_BUCKET_REGION,
+  accessKeyId: AWS_ACCESS_KEY_ID,
+  secretAccessKey: AWS_SECRET_ACCESS_KEY,
+});
 
 const s3 = new AWS.S3({
   apiVersion: "2006-03-01",

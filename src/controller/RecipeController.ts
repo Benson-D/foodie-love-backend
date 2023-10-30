@@ -56,7 +56,10 @@ export default class RecipeController {
    * @returns
    */
   public static async createRecipeAndIngredients(req: Request, res: Response) {
-    const validator = validate(req.body, recipeNewSchema);
+    const creationBody = req.body;
+    creationBody.userId = req.user?.id;
+
+    const validator = validate(creationBody, recipeNewSchema);
 
     if (!validator.valid) {
       const errs = validator.errors.map((e) => e.stack);
@@ -65,13 +68,12 @@ export default class RecipeController {
     }
 
     try {
-      const recipe = await RecipeModel.createRecipe(req.body);
+      const recipe = await RecipeModel.createRecipe(creationBody);
 
       const { ingredientList } = req.body;
-      const recipeIngredients = JSON.parse(ingredientList);
 
       const responseIngredients = await Promise.all(
-        recipeIngredients.map(
+        ingredientList.map(
           async (list: {
             amount: string;
             measurement: string;

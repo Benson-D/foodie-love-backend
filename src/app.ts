@@ -1,5 +1,6 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
+import bodyParser from "body-parser";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
@@ -14,6 +15,8 @@ import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.json());
 app.use(morgan("tiny"));

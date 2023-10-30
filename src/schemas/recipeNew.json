@@ -13,7 +13,7 @@
       "type": "number"
     },
     "instructions": {
-      "type": "string"
+      "type": "array"
     },
     "mealType": {
       "type": "string"
@@ -22,7 +22,7 @@
       "type": "string"
     },
     "ingredientList": {
-      "type": "string"
+      "type": "array"
     },
     "userId": {
       "type": "string"

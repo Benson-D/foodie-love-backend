@@ -10,6 +10,9 @@ dependencies:
   bcrypt:
     specifier: ^5.1.1
     version: 5.1.1
+  body-parser:
+    specifier: ^1.20.2
+    version: 1.20.2
   cookie-parser:
     specifier: ^1.4.6
     version: 1.4.6
@@ -57,6 +60,9 @@ devDependencies:
   "@types/bcrypt":
     specifier: ^5.0.0
     version: 5.0.0
+  "@types/body-parser":
+    specifier: ^1.19.4
+    version: 1.19.4
   "@types/cookie-parser":
     specifier: ^1.4.5
     version: 1.4.5
@@ -1205,10 +1211,10 @@ packages:
       "@types/node": 20.6.2
     dev: true
 
-  /@types/body-parser@1.19.3:
+  /@types/body-parser@1.19.4:
     resolution:
       {
-        integrity: sha512-oyl4jvAfTGX9Bt6Or4H9ni1Z447/tQuxnZsytsCaExKlmJiU8sFgnIBRzJUpKwB5eWn9HuBYlUlVA74q/yN0eQ==,
+        integrity: sha512-N7UDG0/xiPQa2D/XrVJXjkWbpqHCd2sBaB32ggRF2l83RhPfamgKGF8gwwqyksS95qUS5ZYF9aF+lLPRlwI2UA==,
       }
     dependencies:
       "@types/connect": 3.4.36
@@ -1277,7 +1283,7 @@ packages:
         integrity: sha512-Q4FmmuLGBG58btUnfS1c1r/NQdlp3DMfGDGig8WhfpA2YRUtEkxAjkZb0yvplJGYdF1fsQ81iMDcH24sSCNC/Q==,
       }
     dependencies:
-      "@types/body-parser": 1.19.3
+      "@types/body-parser": 1.19.4
       "@types/express-serve-static-core": 4.17.36
       "@types/qs": 6.9.8
       "@types/serve-static": 1.15.2
@@ -2135,6 +2141,29 @@ packages:
       on-finished: 2.4.1
       qs: 6.11.0
       raw-body: 2.5.1
+      type-is: 1.6.18
+      unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /body-parser@1.20.2:
+    resolution:
+      {
+        integrity: sha512-ml9pReCu3M61kGlqoTm2umSXTlRTuGTx0bfYj+uIUKKYycG5NtSbeetV3faSU6R7ajOPw0g/J1PvK4qNy7s5bA==,
+      }
+    engines: { node: ">= 0.8", npm: 1.2.8000 || >= 1.4.16 }
+    dependencies:
+      bytes: 3.1.2
+      content-type: 1.0.5
+      debug: 2.6.9
+      depd: 2.0.0
+      destroy: 1.2.0
+      http-errors: 2.0.0
+      iconv-lite: 0.4.24
+      on-finished: 2.4.1
+      qs: 6.11.0
+      raw-body: 2.5.2
       type-is: 1.6.18
       unpipe: 1.0.0
     transitivePeerDependencies:
@@ -5854,6 +5883,19 @@ packages:
     resolution:
       {
         integrity: sha512-qqJBtEyVgS0ZmPGdCFPWJ3FreoqvG4MVQln/kCgF7Olq95IbOp0/BWyMwbdtn4VTvkM8Y7khCQ2Xgk/tcrCXig==,
+      }
+    engines: { node: ">= 0.8" }
+    dependencies:
+      bytes: 3.1.2
+      http-errors: 2.0.0
+      iconv-lite: 0.4.24
+      unpipe: 1.0.0
+    dev: false
+
+  /raw-body@2.5.2:
+    resolution:
+      {
+        integrity: sha512-8zGqypfENjCIqGhgXToC8aB2r7YrBX+AQAfIPs/Mlk+BtPTztOvTS01NRW/3Eh60J+a48lt8qsCzirQ6loCVfA==,
       }
     engines: { node: ">= 0.8" }
     dependencies:

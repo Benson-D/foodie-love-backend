@@ -5,12 +5,10 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
 import passport from "passport";
-import "./configs/passportJWT";
 import "./configs/passportGoogleOAuth2";
+import "./configs/passportJWT";
 import { NotFoundError, ExpressError } from "./utils/expressError";
-import recipeRoutes from "./routes/recipes";
-import userRoutes from "./routes/users";
-import authRoutes from "./routes/auth";
+import apiRoutes from "./routes/index";
 import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
@@ -39,9 +37,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/auth", authRoutes);
-app.use("/user", userRoutes);
-app.use("/recipes", recipeRoutes);
+app.use("/api/v1", apiRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req: Request, res: Response, next: NextFunction) {

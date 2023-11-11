@@ -155,8 +155,6 @@ class RecipeModel {
     mealType?: string;
     userId: string;
   }) {
-    console.log(recipeData, "<==== point reached");
-
     const createRecipe = await prisma.recipe.create({
       data: {
         name: recipeData.recipeName,

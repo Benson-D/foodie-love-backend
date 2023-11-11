@@ -42,6 +42,12 @@ export default class RecipeController {
     }
   }
 
+  /**
+   * Based on recipe id finds and returns the individual recipe.
+   * @param req
+   * @param res
+   * @returns
+   */
   public static async getIndividualRecipe(req: Request, res: Response) {
     const recipeId = req.params.id;
     const foundRecipe = await RecipeModel.findRecipeById(recipeId);
@@ -114,6 +120,12 @@ export default class RecipeController {
     return res.status(201).json({ url: urlResponse || "" });
   }
 
+  /**
+   * Updates a current recipe to the db.
+   * @param req
+   * @param res
+   * @returns
+   */
   public static async updateRecipe(req: Request, res: Response) {
     const recipeId = req.params.id;
 
@@ -124,6 +136,12 @@ export default class RecipeController {
     return res.json({ recipe });
   }
 
+  /**
+   * Deletes a recipe from the db.
+   * @param req
+   * @param res
+   * @returns
+   */
   public static async deleteRecipe(req: Request, res: Response) {
     const deletedRecipe = await RecipeModel.removeRecipe(req.params.id);
     return res.json({ deleted: deletedRecipe });

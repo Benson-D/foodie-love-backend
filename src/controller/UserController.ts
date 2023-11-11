@@ -4,6 +4,12 @@ import { validate } from "jsonschema";
 import * as favoriteRecipe from "../schemas/favoriteRecipe.json";
 
 class UserController {
+  /**
+   * Adds or deletes a users favorite recipe to the db.
+   * @param req
+   * @param res
+   * @returns
+   */
   public static async addOrDeleteFavoriteRecipe(req: Request, res: Response) {
     const validator = validate(req.query, favoriteRecipe);
 
@@ -16,14 +22,10 @@ class UserController {
     const userId = req.query.userId as string;
     const recipeId = req.query.recipeId as string;
 
-    console.log("backend received for ", userId, recipeId);
-
     const findFavoriteRecipe = await UserModel.findFavoriteRecipe(
       userId,
       recipeId,
     );
-
-    console.log(findFavoriteRecipe, "checking data ");
 
     if (findFavoriteRecipe) {
       const deleteFavoriteRecipe = await UserModel.deleteFavoriteRecipe(

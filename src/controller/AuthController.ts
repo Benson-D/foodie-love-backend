@@ -7,7 +7,7 @@ import { REFRESH_TIME } from "../configs/general";
 
 class AuthController {
   public static async verifyRefreshToken(req: Request, res: Response) {
-    const { refreshToken } = req.cookies;
+    const refreshToken = req.cookies?.refresh_jwt;
 
     try {
       jwt.verify(
@@ -16,15 +16,21 @@ class AuthController {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async (err: VerifyErrors | null, decoded: any | undefined) => {
           if (err || !decoded.id) {
-            return res.status(401).json({ errors: "Invalid Refresh Token" });
+            return res.status(403).json({ errors: "Invalid Refresh Token" });
           }
 
           const user = await UserModel.findById(decoded.id as string);
           if (!user) {
-            return res.status(401).json({ message: "Invalid User" });
+            return res.status(403).json({ message: "Invalid User" });
           }
 
-          const token = createToken(user);
+          const tokenUserData = {
+            id: user.id,
+            username: user.username,
+            role: user.role,
+          };
+
+          const token = createToken(tokenUserData);
           return res
             .status(201)
             .json({ message: "New Token Acquired!", token });
@@ -69,7 +75,9 @@ class AuthController {
       }
     });
 
-    res.send("Successful Logout!");
+    res
+      .clearCookie("refresh_jwt", { httpOnly: true, secure: false })
+      .send({ message: "Successful Logout!" });
   }
 }
 

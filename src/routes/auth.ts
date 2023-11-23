@@ -27,6 +27,6 @@ router.get(
 
 router.get("/user", isUserAuthenticated, AuthController.verifyGoogleOAuth2);
 
-router.get("/logout", AuthController.userLogout);
+router.post("/logout", AuthController.userLogout);
 
 export default router;

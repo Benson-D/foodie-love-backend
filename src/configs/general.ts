@@ -32,7 +32,6 @@ console.log("Foodie Love Config:");
 console.log("SECRET_KEY:", SECRET_KEY);
 console.log("PORT:", PORT.toString());
 console.log("BCRYPT_WORK_FACTOR", BCRYPT_WORK_FACTOR);
-console.log(getDatabaseUri());
 console.log("----");
 
 export {

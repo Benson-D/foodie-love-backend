@@ -8,17 +8,24 @@ import passport from "passport";
 import "./configs/passportGoogleOAuth2";
 import "./configs/passportJWT";
 import { NotFoundError, ExpressError } from "./utils/expressError";
-import apiRoutes from "./routes/index";
+import recipeRoutes from "./routes/recipes";
+import userRoutes from "./routes/users";
+import authRoutes from "./routes/auth";
 import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+// middleware for cookies
 app.use(cookieParser());
+
+// built-in middleware for json
 app.use(express.json());
 app.use(morgan("tiny"));
 
+// Cross Origin Resource Sharing
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -37,7 +44,9 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use("/api/v1", apiRoutes);
+app.use("/auth", authRoutes);
+app.use("/user", userRoutes);
+app.use("/recipes", recipeRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req: Request, res: Response, next: NextFunction) {

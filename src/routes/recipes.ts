@@ -1,15 +1,12 @@
 import { Router } from "express";
 import RecipeController from "../controller/RecipeController";
 import multer from "multer";
-import {
-  isUserAuthenticated,
-  authenticateJWTPassport,
-} from "../middleware/auth";
+import { isUserAuthenticated } from "../middleware/auth";
 
 const upload = multer({ dest: "uploads/" });
 const router: Router = Router();
 
-router.get("/", authenticateJWTPassport, RecipeController.getAllRecipes);
+router.get("/", isUserAuthenticated, RecipeController.getAllRecipes);
 router.get("/:id", isUserAuthenticated, RecipeController.getIndividualRecipe);
 
 router.post(

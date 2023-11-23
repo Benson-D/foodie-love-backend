@@ -14,15 +14,15 @@ export default class RecipeController {
    * @returns
    */
   public static async getAllRecipes(req: Request, res: Response) {
-    const recipeQuery = req.query as Record<string, string | number>;
+    const recipeSearchParams = req.query as Record<string, string | number>;
 
-    recipeQuery.skip = Number(recipeQuery.skip) || 0;
+    recipeSearchParams.skip = Number(recipeSearchParams.skip) || 0;
 
-    if (recipeQuery?.cookingTime) {
-      recipeQuery.cookingTime = Number(recipeQuery.cookingTime);
+    if (recipeSearchParams?.cookingTime) {
+      recipeSearchParams.cookingTime = Number(recipeSearchParams.cookingTime);
     }
 
-    const validator = validate(recipeQuery, recipeSearchSchema);
+    const validator = validate(recipeSearchParams, recipeSearchSchema);
 
     if (!validator.valid) {
       const errs = validator.errors.map((e) => e.stack);
@@ -32,9 +32,9 @@ export default class RecipeController {
     try {
       const userId = req.user?.id ? req.user.id : "0";
       const recipes = await RecipeModel.findAll(
-        recipeQuery,
+        recipeSearchParams,
         userId,
-        Number(recipeQuery.skip),
+        Number(recipeSearchParams.skip),
       );
       return res.json({ recipes });
     } catch (error) {

@@ -83,10 +83,13 @@ model UserFavoriteRecipe {
 }
 
 model UserGrocery {
-  userId String
-  itemId String
-  user   User       @relation(fields: [userId], references: [id])
-  item   Ingredient @relation(fields: [itemId], references: [id])
+  userId    String
+  itemId    String
+  createdAt DateTime   @default(now())
+  price     Int?
+  storeName String?
+  user      User       @relation(fields: [userId], references: [id])
+  item      Ingredient @relation(fields: [itemId], references: [id])
 
   @@id([userId, itemId])
   @@index([itemId])

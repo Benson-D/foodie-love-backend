@@ -7,6 +7,7 @@ const upload = multer({ dest: "uploads/" });
 const router: Router = Router();
 
 router.get("/", isUserAuthenticated, RecipeController.getAllRecipes);
+router.get("/measurements", RecipeController.getAllMeasurements);
 router.get("/:id", isUserAuthenticated, RecipeController.getIndividualRecipe);
 
 router.post(
@@ -20,7 +21,11 @@ router.post(
   RecipeController.uploadRecipeImage,
 );
 
-router.patch("/:id", isUserAuthenticated, RecipeController.updateRecipe);
+router.patch(
+  "/",
+  isUserAuthenticated,
+  RecipeController.updateRecipeWithIngredients,
+);
 
 router.delete("/:id", isUserAuthenticated, RecipeController.deleteRecipe);
 

@@ -38,7 +38,7 @@ export default class RecipeController {
       );
       return res.json({ recipes });
     } catch (error) {
-      return res.status(500).json({ error: "Internal Server Error" });
+      return res.status(500).json({ error: "Internal Server Error: recipes" });
     }
   }
 
@@ -50,9 +50,29 @@ export default class RecipeController {
    */
   public static async getIndividualRecipe(req: Request, res: Response) {
     const recipeId = req.params.id;
-    const foundRecipe = await RecipeModel.findRecipeById(recipeId);
 
-    return res.json({ recipe: foundRecipe });
+    try {
+      const foundRecipe = await RecipeModel.findRecipeById(recipeId);
+      return res.json(foundRecipe);
+    } catch (error) {
+      return res.status(500).json({ error: "Internal Server Error: recipes" });
+    }
+  }
+
+  public static async getAllMeasurements(req: Request, res: Response) {
+    const foundMeasurements = await RecipeModel.findAllMeasurementUnits();
+    const formattedMeasurements = foundMeasurements
+      .map(({ description }) => {
+        return { value: description, label: description };
+      })
+      .filter(({ value }) => value !== "");
+
+    const measurementOutput = [
+      { value: "", label: "none" },
+      ...formattedMeasurements,
+    ];
+
+    return res.json(measurementOutput);
   }
 
   /**
@@ -69,7 +89,6 @@ export default class RecipeController {
 
     if (!validator.valid) {
       const errs = validator.errors.map((e) => e.stack);
-      console.log(errs, "error");
       return res.status(400).json({ errors: errs });
     }
 
@@ -126,14 +145,33 @@ export default class RecipeController {
    * @param res
    * @returns
    */
-  public static async updateRecipe(req: Request, res: Response) {
-    const recipeId = req.params.id;
+  public static async updateRecipeWithIngredients(req: Request, res: Response) {
+    try {
+      const recipe = await RecipeModel.updateRecipe(req.body.id, req.body);
 
-    const recipe = await RecipeModel.updateRecipeWithIngredients(
-      recipeId,
-      req.body,
-    );
-    return res.json({ recipe });
+      const foundRecipeIngredients =
+        await RecipeModel.findAllRecipeIngredientsById(req.body.id);
+      foundRecipeIngredients.map(async (recipe) => {
+        await RecipeModel.removeRecipeIngredients(recipe);
+      });
+
+      const responseIngredients = await Promise.all(
+        req.body.ingredientList.map(
+          async (list: {
+            amount: string;
+            measurement: string;
+            ingredient: string;
+          }) => await _ingredientBuilder(recipe.id, list),
+        ),
+      );
+
+      return res.json({ id: recipe.id, ingredients: [...responseIngredients] });
+    } catch (err) {
+      console.error(err);
+      return res
+        .status(500)
+        .json({ err: "An error occurred while updating the recipe." });
+    }
   }
 
   /**

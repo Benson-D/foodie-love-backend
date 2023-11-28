@@ -138,6 +138,31 @@ class RecipeModel {
     return createMeasurement;
   }
 
+  public static async findAllMeasurementUnits() {
+    const foundMeasurements = await prisma.measurementUnit.findMany({
+      where: {
+        description: {
+          not: undefined,
+        },
+      },
+      select: {
+        description: true,
+      },
+    });
+
+    return foundMeasurements;
+  }
+
+  public static async findAllRecipeIngredientsById(recipeId: string) {
+    const foundRecipeIngredients = await prisma.recipeIngredient.findMany({
+      where: {
+        recipeId: recipeId,
+      },
+    });
+
+    return foundRecipeIngredients;
+  }
+
   /**
    * Creates an individual recipe and adds to db
    * @param recipeData
@@ -199,9 +224,14 @@ class RecipeModel {
       cookingTime: number;
       recipeImage?: string;
       mealType?: string;
-      instructions: string;
+      instructions: {
+        instruction: string;
+      }[];
     },
   ) {
+    const foundRecipe = await this.findRecipeById(recipeId);
+    if (!foundRecipe) throw new NotFoundError(`Recipe not found: ${recipeId}`);
+
     const updatedRecipe = await prisma.recipe.update({
       where: {
         id: recipeId,
@@ -212,6 +242,7 @@ class RecipeModel {
         cookingTime: recipeData.cookingTime,
         recipeImage: recipeData.recipeImage ?? null,
         mealType: recipeData.mealType ?? null,
+        instructions: recipeData.instructions,
       },
     });
 
@@ -241,41 +272,6 @@ class RecipeModel {
     });
 
     return updatedRecipeIngredient;
-  }
-
-  /**
-   * Updates the recipe table and recipeIngredient table
-   * @param {number} recipeId
-   * @param {Object} recipeData
-   * @returns
-   */
-  public static async updateRecipeWithIngredients(
-    recipeId: string,
-    recipeData: {
-      recipeName: string;
-      prepTime?: number;
-      cookingTime: number;
-      recipeImage?: string;
-      mealType?: string;
-      instructions: string;
-      ingredients: {
-        amount: number;
-        measurementId?: string;
-        ingredientId: string;
-      }[];
-    },
-  ) {
-    const foundRecipe = await this.findRecipeById(recipeId);
-
-    if (!foundRecipe) throw new NotFoundError(`Recipe not found: ${recipeId}`);
-
-    const updatedRecipe = await this.updateRecipe(recipeId, recipeData);
-
-    for (const ingredientItems of recipeData.ingredients) {
-      await this.updateRecipeIngredient(recipeId, ingredientItems);
-    }
-
-    return updatedRecipe;
   }
 
   public static async removeRecipe(recipeId: string) {

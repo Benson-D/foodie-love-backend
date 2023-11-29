@@ -4,9 +4,9 @@
   "description": "recipe resource, grocery list",
   "author": "Benson",
   "license": "ISC",
-  "main": "server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node ./dist/server.js",
+    "start": "node dist/server.js",
     "build": "tsc",
     "dev": "ts-node-dev src/server.ts",
     "format": "exec prettier . --write",

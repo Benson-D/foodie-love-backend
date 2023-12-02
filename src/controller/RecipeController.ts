@@ -36,7 +36,7 @@ export default class RecipeController {
         userId,
         Number(recipeSearchParams.skip),
       );
-      console.log(recipes, "<==== check validation");
+
       return res.json({ recipes });
     } catch (error) {
       return res.status(500).json({ error: "Internal Server Error: recipes" });

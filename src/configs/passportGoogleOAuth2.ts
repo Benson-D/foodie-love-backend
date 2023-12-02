@@ -26,6 +26,8 @@ async function verifyGoogleOAuth20(
     defaultUser,
   );
 
+  console.log(userData, "<=== passport google oauth verify");
+
   done(null, userData);
 }
 

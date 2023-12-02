@@ -42,6 +42,8 @@ class AuthController {
   }
 
   public static verifyGoogleOAuth2(req: Request, res: Response) {
+    console.log(req.user, "<==== verifyGoogleOauth2");
+
     try {
       if (req.user) {
         const user = {

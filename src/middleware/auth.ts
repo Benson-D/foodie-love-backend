@@ -34,6 +34,8 @@ function ensureUserLoggedIn(req: Response, res: Response, next: NextFunction) {
 }
 
 function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
+  console.log(req.user, "validate req users");
+
   if (!req.user) {
     res.status(401).send("You must login first!");
   } else {

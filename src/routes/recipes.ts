@@ -6,7 +6,7 @@ import { isUserAuthenticated } from "../middleware/auth";
 const upload = multer({ dest: "uploads/" });
 const router: Router = Router();
 
-router.get("/", isUserAuthenticated, RecipeController.getAllRecipes);
+router.get("/", RecipeController.getAllRecipes);
 router.get("/measurements", RecipeController.getAllMeasurements);
 router.get("/:id", isUserAuthenticated, RecipeController.getIndividualRecipe);
 

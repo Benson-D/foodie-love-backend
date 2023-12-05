@@ -28,7 +28,7 @@ app.use(morgan("tiny"));
 // Cross Origin Resource Sharing
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://foodielove.vercel.app"],
     credentials: true,
   }),
 );

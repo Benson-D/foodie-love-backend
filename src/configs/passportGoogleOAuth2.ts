@@ -26,6 +26,7 @@ async function verifyGoogleOAuth20(
     defaultUser,
   );
 
+  console.log(userData, "<=== verified oauth2 for passport");
   done(null, userData);
 }
 
@@ -34,7 +35,7 @@ passport.use(
     {
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://foodieloveapi.onrender.com/auth/google/redirect",
+      callbackURL: "/auth/google/redirect",
       //callbackURL: "http://localhost:3001/auth/google/redirect"
     },
     verifyGoogleOAuth20,
@@ -48,5 +49,6 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id: string, done) => {
   const user = await UserModel.findById(id);
 
+  console.log(user, "<==== deserialized user for passport");
   done(null, user);
 });

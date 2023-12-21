@@ -34,7 +34,12 @@ function ensureUserLoggedIn(req: Response, res: Response, next: NextFunction) {
 }
 
 function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
-  console.log(req.user, "<=== validate req users for middleware");
+  console.log(
+    req.user,
+    "<=== validate req users for middleware",
+    req,
+    "<==== general request",
+  );
 
   if (!req.user) {
     res.status(401).send("You must login first!");

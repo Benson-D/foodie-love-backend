@@ -26,7 +26,7 @@ async function verifyGoogleOAuth20(
     defaultUser,
   );
 
-  done(null, userData);
+  return done(null, userData);
 }
 
 passport.use(
@@ -48,6 +48,5 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id: string, done) => {
   const user = await UserModel.findById(id);
 
-  console.log(user, "<==== deserialized user for passport");
   done(null, user);
 });

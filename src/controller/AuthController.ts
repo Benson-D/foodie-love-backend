@@ -41,30 +41,6 @@ class AuthController {
     }
   }
 
-  public static verifyGoogle(req: Request, res: Response) {
-    console.log(req.user, "<==== verifyGoogleOauth2");
-
-    if (req.user) {
-      const user = {
-        id: req.user.id,
-        username: req.user.username ?? "",
-        role: req.user.role,
-      };
-
-      const token = createToken(user);
-      const refreshToken = createToken(user, REFRESH_TIME);
-
-      res
-        .cookie("refresh_jwt", refreshToken, {
-          httpOnly: true,
-          secure: false,
-        })
-        .header("Authorization", `Bearer ${token}`)
-        .status(200)
-        .json({ token, user: req.user });
-    }
-  }
-
   public static verifyGoogleOAuth2(req: Request, res: Response) {
     console.log(req.user, "<==== verifyGoogleOauth2");
 

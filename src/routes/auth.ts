@@ -20,12 +20,11 @@ router.get(
   "/google/redirect",
   passport.authenticate("google", {
     failureMessage: "Cannot login to Google, please try again later!",
-    // failureRedirect: "http://localhost:5173/login/error",
-    // successRedirect: "http://localhost:5173/login/success",
+    failureRedirect: "http://localhost:5173/login/error",
+    successRedirect: "http://localhost:5173/login/success",
     // failureRedirect: "https://foodielove.vercel.app/login/error",
     // successRedirect: "https://foodielove.vercel.app/login/success",
   }),
-  AuthController.verifyGoogle,
 );
 
 router.get("/user", isUserAuthenticated, AuthController.verifyGoogleOAuth2);

@@ -58,7 +58,7 @@ class AuthController {
         res
           .cookie("refresh_jwt", refreshToken, {
             httpOnly: true,
-            secure: false,
+            secure: true,
           })
           .header("Authorization", `Bearer ${token}`)
           .status(200)

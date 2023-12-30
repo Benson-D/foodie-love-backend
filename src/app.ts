@@ -50,6 +50,14 @@ app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/recipes", recipeRoutes);
 
+app.get("/", (req: Request, res: Response) => {
+  // Log the session information
+  console.log("Session:", req.session);
+
+  // Your other route handling logic here
+  res.send("Hello, Welcome to the Foodie API!");
+});
+
 /** Handle 404 errors -- this matches everything */
 app.use(function (req: Request, res: Response, next: NextFunction) {
   return next(new NotFoundError());

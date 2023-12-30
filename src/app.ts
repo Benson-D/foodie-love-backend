@@ -38,7 +38,7 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000,
     keys: [COOKIE_SECRET],
     secure: true,
-    sameSite: "none",
+    sameSite: false,
   }),
 );
 

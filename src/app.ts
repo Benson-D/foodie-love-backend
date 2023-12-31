@@ -15,6 +15,8 @@ import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
 
+app.set("trust proxy", 1);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -49,8 +51,6 @@ app.use(passport.session());
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
 app.use("/recipes", recipeRoutes);
-
-app.set("trust proxy", 1);
 
 app.get("/", (req: Request, res: Response) => {
   // Log the session information

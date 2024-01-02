@@ -15,8 +15,6 @@ import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
 
-app.set("trust proxy", 1);
-
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -40,13 +38,15 @@ app.use(
     maxAge: 24 * 60 * 60 * 1000,
     keys: [COOKIE_SECRET],
     secure: true,
-    sameSite: false,
+    sameSite: "none",
   }),
 );
 
 // initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
+
+app.set("trust proxy", 1);
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);

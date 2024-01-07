@@ -3,8 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-// import cookieSession from "cookie-session";
-import session from "express-session";
+import cookieSession from "cookie-session";
 import passport from "passport";
 import "./configs/passportGoogleOAuth2";
 import "./configs/passportJWT";
@@ -16,9 +15,7 @@ import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
 
-app.set("trust proxy", (ip: unknown) => {
-  console.log(ip, "requesting ip address");
-});
+app.set("trust proxy", 1);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -38,25 +35,13 @@ app.use(
   }),
 );
 
-// app.use(
-//   cookieSession({
-//     maxAge: 24 * 60 * 60 * 1000,
-//     keys: [COOKIE_SECRET],
-//     // secure: true,
-//     // sameSite: "none",
-//   }),
-// );
 app.use(
-  session({
-    secret: COOKIE_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: true,
-      sameSite: "none",
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-    },
+  cookieSession({
+    maxAge: 24 * 60 * 60 * 1000,
+    keys: [COOKIE_SECRET],
+    secure: true,
+    sameSite: "none",
+    httpOnly: true,
   }),
 );
 

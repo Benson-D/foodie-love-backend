@@ -33,7 +33,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://foodielove.vercel.app",
-      "https://foodielove-benson.netlify.app/",
+      "https://foodielove-benson.netlify.app",
     ],
     credentials: true,
   }),

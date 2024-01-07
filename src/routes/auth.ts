@@ -20,8 +20,10 @@ router.get(
   "/google/redirect",
   passport.authenticate("google", {
     failureMessage: "Cannot login to Google, please try again later!",
-    failureRedirect: "https://foodielove.vercel.app/login/error",
-    successRedirect: "https://foodielove.vercel.app/login/success",
+    // failureRedirect: "https://foodielove.vercel.app/login/error",
+    // successRedirect: "https://foodielove.vercel.app/login/success",
+    failureRedirect: "https://foodielove-benson.netlify.app/login/error",
+    successRedirect: "https://foodielove-benson.netlify.app/login/success",
   }),
 );
 

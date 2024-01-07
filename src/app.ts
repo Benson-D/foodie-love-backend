@@ -16,7 +16,9 @@ import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
 
-app.set("trust proxy", "https://foodielove.vercel.app");
+app.set("trust proxy", (ip: unknown) => {
+  console.log(ip, "requesting ip address");
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());

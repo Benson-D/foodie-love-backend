@@ -3,7 +3,8 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import cookieSession from "cookie-session";
+// import cookieSession from "cookie-session";
+import session from "express-session";
 import passport from "passport";
 import "./configs/passportGoogleOAuth2";
 import "./configs/passportJWT";
@@ -25,7 +26,7 @@ app.use(cookieParser());
 
 // built-in middleware for json
 app.use(express.json());
-app.use(morgan("tiny"));
+app.use(morgan("combined"));
 
 // Cross Origin Resource Sharing
 app.use(
@@ -35,12 +36,25 @@ app.use(
   }),
 );
 
+// app.use(
+//   cookieSession({
+//     maxAge: 24 * 60 * 60 * 1000,
+//     keys: [COOKIE_SECRET],
+//     // secure: true,
+//     // sameSite: "none",
+//   }),
+// );
 app.use(
-  cookieSession({
-    maxAge: 24 * 60 * 60 * 1000,
-    keys: [COOKIE_SECRET],
-    // secure: true,
-    // sameSite: "none",
+  session({
+    secret: COOKIE_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,
+      sameSite: "none",
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    },
   }),
 );
 
@@ -53,10 +67,6 @@ app.use("/user", userRoutes);
 app.use("/recipes", recipeRoutes);
 
 app.get("/", (req: Request, res: Response) => {
-  // Log the session information
-  console.log("Session:", req.session);
-
-  // Your other route handling logic here
   res.send("Hello, Welcome to the Foodie API!");
 });
 

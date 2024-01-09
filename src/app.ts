@@ -42,6 +42,7 @@ app.use(
     secure: true,
     sameSite: "none",
     httpOnly: true,
+    domain: "https://foodielove.vercel.app",
   }),
 );
 

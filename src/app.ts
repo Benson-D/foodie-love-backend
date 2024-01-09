@@ -30,11 +30,7 @@ app.use(morgan("combined"));
 // Cross Origin Resource Sharing
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://foodielove.vercel.app",
-      "https://foodielove-benson.netlify.app",
-    ],
+    origin: ["http://localhost:5173", "https://foodielove.vercel.app"],
     credentials: true,
   }),
 );

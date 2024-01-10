@@ -15,6 +15,8 @@ import { COOKIE_SECRET } from "./configs/general";
 
 const app: Express = express();
 
+app.set("trust proxy", 1);
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -33,8 +35,6 @@ app.use(
   }),
 );
 
-app.set("trust proxy", 1);
-
 app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
@@ -42,7 +42,7 @@ app.use(
     secure: true,
     sameSite: "none",
     httpOnly: true,
-    domain: "https://foodielove.vercel.app",
+    domain: "foodielove.vercel.app",
   }),
 );
 

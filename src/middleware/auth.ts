@@ -34,6 +34,11 @@ function ensureUserLoggedIn(req: Response, res: Response, next: NextFunction) {
 }
 
 function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
+  console.log("<=====MIDDLEWARE AUTH======>");
+  console.log("Requesting URL:", req.headers.referer);
+  console.log("Requesting user:", req.user);
+  console.log("Requesting session:", req.session);
+
   if (!req.user) {
     res.status(401).send("You must login first!");
   } else {

@@ -23,6 +23,11 @@ router.get(
     failureRedirect: "https://foodielove.vercel.app/login/error",
   }),
   (req: Request, res: Response) => {
+    console.log("<======GOOGLE REDIRECT======>");
+    console.log("Requesting URL:", req.headers.referer);
+    console.log("Requesting user:", req.user);
+    console.log("Requesting session:", req.session);
+
     res.cookie("authorized-user", JSON.stringify(req.user));
     res.redirect("https://foodielove.vercel.app/login/success");
   },

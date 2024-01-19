@@ -25,7 +25,7 @@ app.use(cookieParser());
 
 // built-in middleware for json
 app.use(express.json());
-app.use(morgan("combined"));
+app.use(morgan("tiny"));
 
 // Cross Origin Resource Sharing
 app.use(

@@ -33,17 +33,35 @@ function ensureUserLoggedIn(req: Response, res: Response, next: NextFunction) {
   )(req, res, next);
 }
 
-function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
-  console.log("<=====MIDDLEWARE AUTH======>");
-  console.log("Requesting URL:", req.headers.referer);
-  console.log("Requesting user:", req.user);
-  console.log("Requesting session:", req.session);
+function authenticateUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const authorizedHeaders = req.headers;
+    console.log(
+      authorizedHeaders,
+      "<=== headers",
+      req,
+      "<==== general request",
+    );
 
-  if (!req.user) {
+    next();
+  } catch (err) {
+    next();
+  }
+}
+
+function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
+  const sessionData = req.session;
+
+  if (!sessionData!.user && !sessionData!.user?.id) {
     res.status(401).send("You must login first!");
   } else {
     next();
   }
 }
 
-export { isUserAuthenticated, authenticateJWTPassport, ensureUserLoggedIn };
+export {
+  isUserAuthenticated,
+  authenticateJWTPassport,
+  ensureUserLoggedIn,
+  authenticateUser,
+};

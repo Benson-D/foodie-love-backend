@@ -30,7 +30,9 @@ export default class RecipeController {
     }
 
     try {
-      const userId = req.user?.id ? req.user.id : "0";
+      const sessionData = req.session;
+
+      const userId = sessionData!.user?.id ? sessionData!.user?.id : "0";
       const recipes = await RecipeModel.findAll(
         recipeSearchParams,
         userId,

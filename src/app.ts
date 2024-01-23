@@ -39,10 +39,10 @@ app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: [COOKIE_SECRET],
-    secure: true,
-    sameSite: "none",
-    httpOnly: true,
-    domain: "foodielove.vercel.app",
+    // secure: true,
+    // sameSite: "none",
+    // httpOnly: true,
+    // domain: "foodielove.vercel.app",
   }),
 );
 

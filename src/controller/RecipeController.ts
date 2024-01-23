@@ -14,6 +14,8 @@ export default class RecipeController {
    * @returns
    */
   public static async getAllRecipes(req: Request, res: Response) {
+    console.log(req.session, "<=== validate session");
+
     const recipeSearchParams = req.query as Record<string, string | number>;
 
     recipeSearchParams.skip = Number(recipeSearchParams.skip) || 0;

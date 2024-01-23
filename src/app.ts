@@ -8,6 +8,7 @@ import passport from "passport";
 import "./configs/passportGoogleOAuth2";
 import "./configs/passportJWT";
 import { NotFoundError, ExpressError } from "./utils/expressError";
+import { authenticateJWT } from "./middleware/auth";
 import recipeRoutes from "./routes/recipes";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
@@ -39,16 +40,17 @@ app.use(
   cookieSession({
     maxAge: 24 * 60 * 60 * 1000,
     keys: [COOKIE_SECRET],
-    secure: true,
-    sameSite: "none",
+    // secure: true,
+    // sameSite: "none",
     // httpOnly: true,
-    domain: "foodielove.vercel.app",
+    // domain: "foodielove.vercel.app",
   }),
 );
 
 // initialize passport
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(authenticateJWT);
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);

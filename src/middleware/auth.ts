@@ -1,6 +1,33 @@
 import { Request, Response, NextFunction } from "express";
 import passport from "passport";
 import { UnauthorizedError } from "../utils/expressError";
+import jwt from "jsonwebtoken";
+import { SECRET_KEY } from "../configs/general";
+
+/** Middleware: Authenticate user.
+ *
+ * If a token was provided, verify it, and, if valid, store the token payload
+ * on res.locals (this will include the username and isAdmin field.)
+ *
+ * It's not an error if no token was provided or if the token is not valid.
+ */
+
+function authenticateJWT(req: Request, res: Response, next: NextFunction) {
+  const cookies = req.cookies;
+
+  console.log(cookies, "request cookies");
+
+  try {
+    const authHeader = req.headers && req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.replace(/^[Bb]earer /, "").trim();
+      res.locals.user = jwt.verify(token, SECRET_KEY);
+    }
+    return next();
+  } catch (err) {
+    return next();
+  }
+}
 
 function authenticateJWTPassport(
   req: Request,
@@ -33,22 +60,6 @@ function ensureUserLoggedIn(req: Response, res: Response, next: NextFunction) {
   )(req, res, next);
 }
 
-function authenticateUser(req: Request, res: Response, next: NextFunction) {
-  try {
-    const authorizedHeaders = req.headers;
-    console.log(
-      authorizedHeaders,
-      "<=== headers",
-      req,
-      "<==== general request",
-    );
-
-    next();
-  } catch (err) {
-    next();
-  }
-}
-
 function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
   const sessionData = req.session;
 
@@ -60,8 +71,8 @@ function isUserAuthenticated(req: Request, res: Response, next: NextFunction) {
 }
 
 export {
+  authenticateJWT,
   isUserAuthenticated,
   authenticateJWTPassport,
   ensureUserLoggedIn,
-  authenticateUser,
 };

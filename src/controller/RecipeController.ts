@@ -14,8 +14,6 @@ export default class RecipeController {
    * @returns
    */
   public static async getAllRecipes(req: Request, res: Response) {
-    console.log(req.session, "<=== validate session");
-
     const recipeSearchParams = req.query as Record<string, string | number>;
 
     recipeSearchParams.skip = Number(recipeSearchParams.skip) || 0;
@@ -32,9 +30,7 @@ export default class RecipeController {
     }
 
     try {
-      const sessionData = req.session;
-
-      const userId = sessionData!.user?.id ? sessionData!.user?.id : "0";
+      const userId = recipeSearchParams?.userId.toString() ?? "0";
       const recipes = await RecipeModel.findAll(
         recipeSearchParams,
         userId,
@@ -88,7 +84,7 @@ export default class RecipeController {
    */
   public static async createRecipeAndIngredients(req: Request, res: Response) {
     const creationBody = req.body;
-    creationBody.userId = req.user?.id;
+    creationBody.userId = req.user?.id ?? req.body?.userId;
 
     const validator = validate(creationBody, recipeNewSchema);
 

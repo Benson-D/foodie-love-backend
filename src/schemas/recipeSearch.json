@@ -14,6 +14,9 @@
     },
     "skip": {
       "type": "number"
+    },
+    "userId": {
+      "type": "string"
     }
   },
   "additionalProperties": false,

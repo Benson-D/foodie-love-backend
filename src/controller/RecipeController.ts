@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { type Request, type Response } from "express";
 import { validate } from "jsonschema";
 import * as recipeSearchSchema from "../schemas/recipeSearch.json";
 import * as recipeNewSchema from "../schemas/recipeNew.json";

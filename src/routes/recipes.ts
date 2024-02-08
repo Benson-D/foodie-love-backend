@@ -1,5 +1,6 @@
 import { Router } from "express";
 import RecipeController from "../controller/RecipeController";
+import UserController from "../controller/UserController";
 import multer from "multer";
 
 const upload = multer({ dest: "uploads/" });
@@ -15,9 +16,11 @@ router.post(
   upload.single("recipeImage"),
   RecipeController.uploadRecipeImage,
 );
+router.post("/add-favorite", UserController.addOrDeleteFavoriteRecipe);
 
 router.patch("/", RecipeController.updateRecipeWithIngredients);
 
 router.delete("/:id", RecipeController.deleteRecipe);
+router.delete("/remove-favorite", UserController.addOrDeleteFavoriteRecipe);
 
 export default router;

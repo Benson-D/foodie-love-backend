@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { type Request, type Response } from "express";
 import UserModel from "../models/UserModel";
 import { validate } from "jsonschema";
 import * as favoriteRecipe from "../schemas/favoriteRecipe.json";

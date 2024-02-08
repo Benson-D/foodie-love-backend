@@ -20,7 +20,7 @@ router.post("/add-favorite", UserController.addOrDeleteFavoriteRecipe);
 
 router.patch("/", RecipeController.updateRecipeWithIngredients);
 
-router.delete("/:id", RecipeController.deleteRecipe);
 router.delete("/remove-favorite", UserController.addOrDeleteFavoriteRecipe);
+router.delete("/:id", RecipeController.deleteRecipe);
 
 export default router;

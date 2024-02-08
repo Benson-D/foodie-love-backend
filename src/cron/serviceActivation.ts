@@ -8,7 +8,7 @@ async function deactivateSleepMode() {
   try {
     const response = await axios.get("https://foodieloveapi.onrender.com/");
 
-    console.log(response, "Site is live!");
+    console.log(response.data, "Site is live!");
   } catch (err) {
     console.error("Sleep mode is in process or failed call");
   }

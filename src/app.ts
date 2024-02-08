@@ -13,6 +13,7 @@ import recipeRoutes from "./routes/recipes";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
 import { COOKIE_SECRET } from "./configs/general";
+import "./cron/serviceActivation";
 
 const app: Express = express();
 

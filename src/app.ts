@@ -1,18 +1,28 @@
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, {
+  type Express,
+  type Request,
+  type Response,
+  type NextFunction,
+} from "express";
+
 import cors from "cors";
 import bodyParser from "body-parser";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cookieSession from "cookie-session";
+
 import passport from "passport";
 import "./configs/passportGoogleOAuth2";
 import "./configs/passportJWT";
-import { NotFoundError, ExpressError } from "./utils/expressError";
+import { COOKIE_SECRET } from "./configs/general";
+
+import { NotFoundError, type ExpressError } from "./utils/expressError";
 import { authenticateJWT } from "./middleware/auth";
+
 import recipeRoutes from "./routes/recipes";
 import userRoutes from "./routes/users";
 import authRoutes from "./routes/auth";
-import { COOKIE_SECRET } from "./configs/general";
+
 import "./cron/serviceActivation";
 
 const app: Express = express();

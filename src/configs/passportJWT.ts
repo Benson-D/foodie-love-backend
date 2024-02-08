@@ -1,9 +1,9 @@
-import { Request } from "express";
+import { type Request } from "express";
 import passport from "passport";
 import {
   ExtractJwt,
   Strategy as JWTStrategy,
-  VerifiedCallback,
+  type VerifiedCallback,
 } from "passport-jwt";
 import { SECRET_KEY } from "./general";
 import UserModel from "../models/UserModel";

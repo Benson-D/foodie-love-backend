@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import jwt, { VerifyErrors } from "jsonwebtoken";
+import { type Request, type Response } from "express";
+import jwt, { type VerifyErrors } from "jsonwebtoken";
 import { SECRET_KEY } from "../configs/general";
 import UserModel from "../models/UserModel";
 import { createToken } from "../utils/token";

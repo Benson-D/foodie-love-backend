@@ -1,8 +1,8 @@
 import passport from "passport";
 import {
   Strategy as GoogleStrategy,
-  Profile,
-  VerifyCallback,
+  type Profile,
+  type VerifyCallback,
 } from "passport-google-oauth20";
 import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "./general";
 import UserModel from "../models/UserModel";

@@ -4,9 +4,9 @@ import axios from "axios";
 /**
  * Avoid sleep mode through render free tier
  */
-function deactivateSleepMode() {
+async function deactivateSleepMode() {
   try {
-    const response = axios.get("https://foodieloveapi.onrender.com/");
+    const response = await axios.get("https://foodieloveapi.onrender.com/");
 
     console.log(response, "Site is live!");
   } catch (err) {

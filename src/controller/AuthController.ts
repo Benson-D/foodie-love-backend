@@ -79,6 +79,8 @@ class AuthController {
 
       req.session!.user = userData;
 
+      console.log(req.session, "session verified in Auth - verifyOAuth");
+
       return res
         .cookie("refresh_jwt", refreshToken, {
           httpOnly: true,

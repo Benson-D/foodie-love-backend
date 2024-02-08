@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { type Request, type Response, type NextFunction } from "express";
 import passport from "passport";
 import { UnauthorizedError } from "../utils/expressError";
 import jwt from "jsonwebtoken";
